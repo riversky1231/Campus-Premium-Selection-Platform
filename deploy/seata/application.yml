@@ -5,6 +5,8 @@ spring:
     name: seata-server
 logging:
   config: classpath:logback-spring.xml
+  file:
+    path: /seata-server/logs
 console:
   user:
     username: ${SEATA_USER:seata}

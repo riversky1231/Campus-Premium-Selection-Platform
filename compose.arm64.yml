@@ -1,0 +1,24 @@
+# 本机 ARM64（Windows on Snapdragon）覆盖配置。
+# 1) nacos/nacos-server:v2.3.2 未发布 linux/arm64 镜像，保留锁定版本并以 amd64 模拟运行。
+# 2) eclipse-temurin:17-jre-alpine 未发布 linux/arm64 镜像，应用改用非 alpine 运行时，
+#    见 backend/Dockerfile.arm64（其余构建步骤与原 Dockerfile 一致）。
+# 使用：docker compose -f compose.yml -f compose.arm64.yml up --build -d
+services:
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    platform: linux/amd64
+  user:
+    build:
+      dockerfile: backend/Dockerfile.arm64
+  product:
+    build:
+      dockerfile: backend/Dockerfile.arm64
+  order:
+    build:
+      dockerfile: backend/Dockerfile.arm64
+  gateway:
+    build:
+      dockerfile: backend/Dockerfile.arm64
+  monitor:
+    build:
+      dockerfile: backend/Dockerfile.arm64
