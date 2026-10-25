@@ -1,4 +1,7 @@
 -- Campus Market MySQL 8 bootstrap. Runs only on a new data volume.
+-- The official image runs this file with the mysql client in a C locale, which
+-- defaults to latin1; without this the seeded Chinese text is stored double-encoded.
+SET NAMES utf8mb4;
 CREATE DATABASE IF NOT EXISTS campus_product CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE campus_product;
 CREATE TABLE IF NOT EXISTS category (id BIGINT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(40) NOT NULL UNIQUE);
