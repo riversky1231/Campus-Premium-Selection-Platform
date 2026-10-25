@@ -89,6 +89,7 @@ Docker构建启用Seata和监控客户端；生产下单、支付、取消由Tra
 
 ## 接口和数据库
 
+- [公共接口文档](docs/PUBLIC-API.md)：面向客户端的鉴权、参数、响应模型、分页与联调示例。
 - [API文档](docs/API.md)：路由、请求、权限和状态。
 - [OpenAPI文件](docs/openapi.yml)：可导入支持OpenAPI的接口工具。
 - [数据库说明](database/README.md)：三库表结构和初始化。
