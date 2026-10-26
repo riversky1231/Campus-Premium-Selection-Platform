@@ -1,1 +1,140 @@
-<view class="wrap"><view class="eyebrow">MY ORDERS</view><view class="row"><view class="title">我的订单</view><text bindtap="logout" class="muted">退出登录</text></view><view class="card"><view class="row"><view class="label">账户余额</view><view class="price">¥{{balance}}</view></view><view class="stock">余额不足时请联系管理员充值，支付为模拟余额扣款。</view></view><button class="secondary" bindtap="cart">返回购物车</button><view wx:if="{{!orders.length}}" class="empty">还没有订单，去挑选好物吧</view><view wx:for="{{orders}}" wx:key="id" class="card"><view class="row"><view class="name">{{item.label}}</view><view class="muted">{{item.createdAt}}</view></view><view wx:for="{{item.items}}" wx:for-item="line" wx:key="product_id" class="stock">{{line.product_name}} × {{line.quantity}}</view><view class="price">¥{{item.amount}}</view><view class="stock">收货：{{item.recipient}} {{item.phone}} {{item.address}}</view><view wx:if="{{item.status==='PAID'||item.status==='COMPLETED'}}" class="stock">提货码：{{item.pickupCode}}</view><view wx:if="{{item.status==='PENDING'}}" class="row"><button bindtap="pay" data-id="{{item.id}}" loading="{{busy}}" disabled="{{busy}}">立即支付</button><button class="secondary" bindtap="cancel" data-id="{{item.id}}">取消订单</button></view></view></view>
+<view class="page">
+  <view class="orders-head">
+    <view>
+      <view class="eyebrow">MY ORDERS</view>
+      <view class="page-title">我的订单</view>
+      <view class="page-subtitle">{{nickname}}，这里是你下单的好物</view>
+    </view>
+    <view class="orders-head__actions">
+      <text class="orders-head__action" bindtap="openCart">购物车</text>
+      <text class="orders-head__action orders-head__action--muted" bindtap="logout">退出</text>
+    </view>
+  </view>
+
+  <view class="wallet-card">
+    <view class="wallet-card__top">
+      <view>
+        <view class="wallet-card__label">账户余额</view>
+        <view class="wallet-card__amount">
+          <text wx:if="{{balanceLoaded}}" class="wallet-card__yen">¥</text>{{balanceLoaded ? balance : '暂不可用'}}
+        </view>
+      </view>
+      <view class="wallet-card__user">{{nickname}}</view>
+    </view>
+    <view class="wallet-card__hint">余额支付为演示功能，余额不足时请联系管理员充值。</view>
+  </view>
+
+  <scroll-view class="chips orders-filters" scroll-x="true" show-scrollbar="{{false}}">
+    <view class="chips__inner">
+      <view
+        wx:for="{{filters}}"
+        wx:key="label"
+        class="chip {{status == item.key ? 'chip--active' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="selectFilter"
+      >{{item.label}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{loading && !orders.length}}" class="orders-skeleton">
+    <view wx:for="{{skeletons}}" wx:key="*this" class="orders-skeleton__card">
+      <view class="skeleton orders-skeleton__line orders-skeleton__line--short"></view>
+      <view class="skeleton orders-skeleton__line"></view>
+      <view class="skeleton orders-skeleton__block"></view>
+    </view>
+  </view>
+
+  <view wx:elif="{{error && !orders.length}}" class="empty">
+    <view class="empty__icon">🌧️</view>
+    <view class="empty__title">订单加载失败</view>
+    <view class="empty__text">检查网络后重试</view>
+    <view class="empty__action">
+      <view class="btn btn--ghost btn--sm" bindtap="retry">重新加载</view>
+    </view>
+  </view>
+
+  <view wx:elif="{{!loading && !orders.length}}" class="empty">
+    <view class="empty__icon">{{status ? '🔎' : '🧾'}}</view>
+    <view class="empty__title">{{status ? '当前筛选下没有订单' : '还没有订单'}}</view>
+    <view class="empty__text">{{status ? '换个状态看看' : '去挑几件好物，下单后会出现在这里'}}</view>
+    <view class="empty__action">
+      <view class="btn btn--sm" bindtap="goHome">去逛逛</view>
+    </view>
+  </view>
+
+  <view wx:else class="order-list">
+    <view wx:for="{{orders}}" wx:key="id" class="order fade-in">
+      <view class="order__head">
+        <view class="badge badge--{{item.tone}}">{{item.statusText}}</view>
+        <view class="order__time">{{item.timeText}}</view>
+      </view>
+      <view class="order__no">订单号 {{item.orderNo}}</view>
+
+      <view class="order__items">
+        <view
+          wx:for="{{item.items}}"
+          wx:for-item="line"
+          wx:key="product_id"
+          class="order__line"
+        >
+          <view class="order__line-name">{{line.product_name}}</view>
+          <view class="order__line-qty">× {{line.quantity}}</view>
+          <view class="order__line-price">¥{{line.lineTotal}}</view>
+        </view>
+      </view>
+
+      <view class="order__total">
+        <text class="muted">共 {{item.count}} 件 · 合计</text>
+        <text class="price">¥{{item.amountText}}</text>
+      </view>
+
+      <view class="order__address">
+        <text class="order__address-icon">📍</text>
+        <text class="order__address-text">{{item.recipient}} {{item.phone}} · {{item.address}}</text>
+      </view>
+
+      <view
+        wx:if="{{item.status == 'PENDING'}}"
+        class="order__countdown {{item.expired ? 'order__countdown--expired' : ''}}"
+      >
+        <text class="order__countdown-icon">⏱️</text>
+        <text>{{item.expired ? '支付时间已过，订单将自动关闭' : '剩余 ' + item.countdown + ' 支付，超时自动关闭'}}</text>
+      </view>
+
+      <view wx:if="{{item.pickupCode}}" class="pickup">
+        <view class="pickup__main">
+          <view class="pickup__label">{{item.status == 'COMPLETED' ? '已核销提货码' : '提货码'}}</view>
+          <view class="pickup__code" data-code="{{item.pickupCode}}" bindtap="copyCode">{{item.pickupCode}}</view>
+        </view>
+        <view class="pickup__hint">{{item.status == 'COMPLETED' ? '此订单已核销完成' : '点击复制 · 到自提点出示'}}</view>
+      </view>
+
+      <view wx:if="{{item.status == 'PENDING'}}" class="order__actions">
+        <button
+          class="btn btn--ghost btn--sm"
+          data-id="{{item.id}}"
+          bindtap="cancel"
+          disabled="{{busyId == item.id}}"
+        >取消订单</button>
+        <button
+          class="btn btn--sm"
+          data-id="{{item.id}}"
+          bindtap="pay"
+          loading="{{busyId == item.id}}"
+          disabled="{{busyId == item.id || item.expired}}"
+        >{{item.expired ? '已超时' : '立即支付'}}</button>
+      </view>
+
+      <view wx:elif="{{item.status == 'PAID'}}" class="order__hint">等待自提点核销，请保留提货码。</view>
+      <view wx:elif="{{item.status == 'COMPLETED'}}" class="order__hint">订单已完成，感谢光临。</view>
+    </view>
+  </view>
+
+  <view wx:if="{{orders.length}}" class="pager">
+    <view wx:if="{{loadingMore}}" class="pager__text">正在加载…</view>
+    <view wx:elif="{{hasMore}}" class="btn btn--ghost btn--sm" bindtap="loadMore">加载更多</view>
+    <view wx:else class="pager__text">已显示全部订单</view>
+  </view>
+
+  <view class="footer">CAMPUS PREMIUM SELECTION · 我的订单</view>
+</view>

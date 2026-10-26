@@ -1,1 +1,145 @@
-<view class="wrap"><view class="eyebrow">CATALOG / EDITOR</view><view class="title">{{id?'编辑好物':'上新一件好物'}}</view><view class="label">商品名称</view><input value="{{name}}" data-field="name" bindinput="field" maxlength="100"/><view class="label">分类</view><picker range="{{categories}}" range-key="name" value="{{index}}" bindchange="category">{{categories[index].name||'请先创建分类'}} ▾</picker><view class="label">价格 / 元</view><input type="digit" value="{{price}}" data-field="price" bindinput="field"/><view wx:if="{{!id}}"><view class="label">初始库存</view><input type="number" value="{{stock}}" data-field="stock" bindinput="field"/></view><view class="label">商品说明</view><textarea value="{{description}}" maxlength="1000" data-field="description" bindinput="field"/><view class="row"><text>立即上架</text><switch checked="{{onSale}}" bindchange="sale" color="#254e3b"/></view><button bindtap="save" loading="{{busy}}" disabled="{{busy}}">保存商品</button></view>
+<view class="page {{categories.length && !loading ? 'page--bar' : ''}}">
+  <view class="editor-head">
+    <view class="eyebrow">CATALOG / EDITOR</view>
+    <view class="page-title">{{isEdit ? '编辑好物' : '上新一件好物'}}</view>
+    <view class="page-subtitle">{{isEdit ? '修改会立即同步到商品展示' : '填写商品信息，保存后马上出现在店铺'}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="editor-skeleton">
+    <view class="skeleton editor-skeleton__line"></view>
+    <view class="skeleton editor-skeleton__line"></view>
+    <view class="skeleton editor-skeleton__block"></view>
+    <view class="skeleton editor-skeleton__line editor-skeleton__line--short"></view>
+  </view>
+
+  <view wx:elif="{{categoriesError}}" class="empty">
+    <view class="empty__icon">🌧️</view>
+    <view class="empty__title">分类加载失败</view>
+    <view class="empty__text">检查后端是否启动，或稍后再试</view>
+    <view class="empty__action">
+      <view class="btn btn--ghost btn--sm" bindtap="retryCategories">重新加载</view>
+    </view>
+  </view>
+
+  <view wx:elif="{{!categories.length}}" class="empty">
+    <view class="empty__icon">🏷️</view>
+    <view class="empty__title">还没有商品分类</view>
+    <view class="empty__text">先到管理台创建一个分类，再上架商品</view>
+    <view class="empty__action">
+      <view class="btn btn--sm" bindtap="goAdmin">去创建分类</view>
+    </view>
+  </view>
+
+  <block wx:else>
+    <view class="card editor-card">
+      <view class="section-title">基本信息</view>
+
+      <view class="field">
+        <view class="field__label">
+          <text>商品名称</text>
+          <text class="field__hint">{{name.length}}/100</text>
+        </view>
+        <input
+          class="input"
+          value="{{name}}"
+          data-field="name"
+          bindinput="field"
+          maxlength="100"
+          placeholder="例如：冰镇柠檬茶"
+          placeholder-class="input-placeholder"
+        />
+      </view>
+
+      <view class="field">
+        <view class="field__label">商品分类</view>
+        <picker
+          range="{{categories}}"
+          range-key="name"
+          value="{{index}}"
+          bindchange="category"
+        >
+          <view class="input editor-picker">
+            <text class="editor-picker__value">{{categoryLabel}}</text>
+            <text class="editor-picker__arrow">▾</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="card editor-card">
+      <view class="section-title">价格与库存</view>
+
+      <view class="field">
+        <view class="field__label">价格 / 元</view>
+        <view class="editor-price">
+          <text class="editor-price__unit">¥</text>
+          <input
+            class="editor-price__input"
+            type="digit"
+            value="{{price}}"
+            data-field="price"
+            bindinput="field"
+            placeholder="0.00"
+            placeholder-class="input-placeholder"
+          />
+        </view>
+      </view>
+
+      <view wx:if="{{!isEdit}}" class="field">
+        <view class="field__label">
+          <text>初始库存</text>
+          <text class="field__hint">0 表示暂时无货</text>
+        </view>
+        <input
+          class="input"
+          type="number"
+          value="{{stock}}"
+          data-field="stock"
+          bindinput="field"
+          placeholder="0"
+          placeholder-class="input-placeholder"
+        />
+      </view>
+      <view wx:else class="note editor-note">库存请在管理台使用「补库存」调整，避免直接改动。</view>
+    </view>
+
+    <view class="card editor-card">
+      <view class="section-title">商品说明</view>
+      <view class="field">
+        <view class="field__label">
+          <text>说明文字</text>
+          <text class="field__hint">{{descriptionLength}}/1000</text>
+        </view>
+        <textarea
+          class="input input--area"
+          value="{{description}}"
+          data-field="description"
+          bindinput="field"
+          maxlength="1000"
+          placeholder="口味、规格、保存方式等，可留空"
+          placeholder-class="input-placeholder"
+        />
+      </view>
+    </view>
+
+    <view class="card editor-switch">
+      <view class="grow">
+        <view class="editor-switch__title">立即上架</view>
+        <view class="muted">关闭后商品仅在管理台可见</view>
+      </view>
+      <switch checked="{{onSale}}" bindchange="sale" color="#204c39" />
+    </view>
+
+    <view class="note editor-tip">保存后可在管理台继续编辑、补库存或上下架。</view>
+  </block>
+</view>
+
+<view wx:if="{{categories.length && !loading}}" class="bottom-bar editor-bar">
+  <view class="editor-bar__hint">{{isEdit ? '修改后立即生效' : '保存后立即上架'}}</view>
+  <button
+    class="btn editor-bar__save"
+    bindtap="save"
+    loading="{{busy}}"
+    disabled="{{busy}}"
+  >保存商品</button>
+</view>

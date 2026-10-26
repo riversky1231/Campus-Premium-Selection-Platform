@@ -1,1 +1,13 @@
-App({globalData:{baseUrl:'http://127.0.0.1:8080'}})
+const { BASE_URL } = require('./utils/config')
+const { currentUser } = require('./utils/session')
+
+App({
+  globalData: {
+    baseUrl: BASE_URL,
+    user: null
+  },
+
+  onLaunch() {
+    this.globalData.user = currentUser()
+  }
+})

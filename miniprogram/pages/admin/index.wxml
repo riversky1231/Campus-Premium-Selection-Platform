@@ -1,1 +1,367 @@
-<view class="wrap"><view class="eyebrow">CAMPUS / WORKSPACE</view><view class="title">好物管理台</view><view class="label">管理员访问令牌（联调阶段）</view><input password="true" value="{{token}}" bindinput="token" placeholder="输入后端配置的 ADMIN_TOKEN"/><view class="row"><button bindtap="login" loading="{{loading}}">连接管理台</button><button class="secondary" bindtap="logout">退出</button></view><button bindtap="create">＋ 新建商品</button><view class="card" wx:for="{{items}}" wx:key="id"><view class="row"><view class="name">{{item.name}}</view><text>{{item.onSale?'在售':'已下架'}}</text></view><view class="price">¥{{item.price}}</view><view class="stock">库存 {{item.stock}}</view><view class="row"><button class="secondary" data-id="{{item.id}}" bindtap="edit">编辑</button><button class="secondary" data-id="{{item.id}}" bindtap="toggle">{{item.onSale?'下架':'上架'}}</button><button data-id="{{item.id}}" bindtap="restock">补库存</button></view></view><button wx:if="{{hasMore}}" bindtap="more" loading="{{loading}}">加载更多商品</button><view class="name">商品分类</view><view wx:for="{{categories}}" wx:key="id" class="row"><text>{{item.name}}</text><button class="secondary" data-id="{{item.id}}" bindtap="rename">改名</button><button class="secondary" data-id="{{item.id}}" bindtap="removeCategory">删除</button></view><input value="{{categoryName}}" bindinput="categoryName" placeholder="新分类名称"/><button bindtap="addCategory">新增分类</button></view>
+<view wx:if="{{stage == 'login'}}" class="page admin-login">
+  <view class="admin-login__head">
+    <view class="eyebrow">STAFF WORKSPACE</view>
+    <view class="page-title">管理台</view>
+    <view class="page-subtitle">用管理员账号登录，管理商品、分类、核销与用户。</view>
+  </view>
+
+  <view class="card admin-login__card">
+    <view class="field">
+      <view class="field__label">管理员账号</view>
+      <input
+        class="input"
+        value="{{username}}"
+        data-field="username"
+        bindinput="field"
+        maxlength="64"
+        placeholder="例如：admin"
+        placeholder-class="input-placeholder"
+      />
+    </view>
+    <view class="field">
+      <view class="field__label">
+        <text>密码</text>
+        <text class="admin-login__toggle" bindtap="togglePassword">{{showPassword ? '隐藏' : '显示'}}</text>
+      </view>
+      <input
+        class="input"
+        password="{{!showPassword}}"
+        value="{{password}}"
+        data-field="password"
+        bindinput="field"
+        maxlength="64"
+        placeholder="请输入管理员密码"
+        placeholder-class="input-placeholder"
+      />
+    </view>
+    <button
+      class="btn btn--block admin-login__submit"
+      bindtap="submitLogin"
+      loading="{{loginBusy}}"
+      disabled="{{loginBusy}}"
+    >登录管理台</button>
+    <view class="note admin-login__note">需要 ADMIN 角色账号；请使用部署时配置的管理员密码。</view>
+  </view>
+
+  <view class="admin-login__back" bindtap="goHome">← 返回店铺</view>
+</view>
+
+<view wx:else class="page admin">
+  <view class="admin-head">
+    <view>
+      <view class="eyebrow">STAFF WORKSPACE</view>
+      <view class="page-title">管理台</view>
+      <view class="page-subtitle">{{adminName}} · 商品与订单实时数据</view>
+    </view>
+    <view class="admin-head__logout" bindtap="logout">退出</view>
+  </view>
+
+  <view class="admin-tabs">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="admin-tab {{tab == item.key ? 'admin-tab--active' : ''}}"
+      data-tab="{{item.key}}"
+      bindtap="switchTab"
+    >
+      <text class="admin-tab__icon">{{item.icon}}</text>
+      <text>{{item.label}}</text>
+    </view>
+  </view>
+
+  <block wx:if="{{tab == 'products'}}">
+    <view class="admin-toolbar">
+      <view class="admin-search">
+        <text class="admin-search__icon">🔍</text>
+        <input
+          class="admin-search__input"
+          value="{{productKeyword}}"
+          bindinput="onProductKeyword"
+          bindconfirm="searchProducts"
+          confirm-type="search"
+          placeholder="搜索商品名称"
+          placeholder-class="input-placeholder"
+          maxlength="100"
+        />
+        <text wx:if="{{productKeyword}}" class="admin-search__clear" bindtap="clearProductSearch">✕</text>
+      </view>
+      <button class="btn btn--sm admin-toolbar__create" bindtap="openCreate">＋ 新建</button>
+    </view>
+
+    <view class="admin-meta">
+      <text>共 {{productTotal}} 件商品</text>
+      <text>每页 10 件</text>
+    </view>
+
+    <view wx:if="{{productLoading && !products.length}}" class="admin-skeletons">
+      <view wx:for="{{skeletons}}" wx:key="*this" class="admin-product admin-product--skeleton">
+        <view class="skeleton admin-product__art-skeleton"></view>
+        <view class="grow">
+          <view class="skeleton admin-skeleton__line"></view>
+          <view class="skeleton admin-skeleton__line admin-skeleton__line--short"></view>
+          <view class="skeleton admin-skeleton__line admin-skeleton__line--tiny"></view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:elif="{{productError && !products.length}}" class="empty">
+      <view class="empty__icon">🌧️</view>
+      <view class="empty__title">商品加载失败</view>
+      <view class="empty__text">检查后端或管理员登录状态</view>
+      <view class="empty__action">
+        <view class="btn btn--ghost btn--sm" bindtap="retryProducts">重新加载</view>
+      </view>
+    </view>
+
+    <view wx:elif="{{!productLoading && !products.length}}" class="empty">
+      <view class="empty__icon">🧺</view>
+      <view class="empty__title">{{productKeyword ? '没有找到商品' : '还没有商品'}}</view>
+      <view class="empty__text">{{productKeyword ? '换个关键词试试' : '创建第一件好物吧'}}</view>
+      <view class="empty__action">
+        <view class="btn btn--sm" bindtap="openCreate">新建商品</view>
+      </view>
+    </view>
+
+    <view wx:else class="admin-products">
+      <view wx:for="{{products}}" wx:key="id" class="admin-product fade-in">
+        <view class="admin-product__art">{{item.emoji}}</view>
+        <view class="admin-product__body">
+          <view class="admin-product__top">
+            <view class="admin-product__name">{{item.name}}</view>
+            <view class="badge {{item.onSale ? 'badge--ok' : 'badge--muted'}}">{{item.onSale ? '在售' : '已下架'}}</view>
+          </view>
+          <view class="admin-product__meta">
+            {{item.categoryName}} · ¥{{item.priceText}} · 库存 {{item.stock}}
+          </view>
+          <view class="admin-product__actions">
+            <view class="admin-action" data-id="{{item.id}}" bindtap="openEdit">编辑</view>
+            <view
+              class="admin-action {{productBusyId == item.id ? 'is-disabled' : ''}}"
+              data-id="{{item.id}}"
+              bindtap="toggleSale"
+            >{{item.onSale ? '下架' : '上架'}}</view>
+            <view class="admin-action admin-action--primary" data-id="{{item.id}}" bindtap="openRestock">补库存</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{products.length}}" class="pager">
+      <view wx:if="{{productLoadingMore}}" class="pager__text">正在加载…</view>
+      <view wx:elif="{{productHasMore}}" class="btn btn--ghost btn--sm" bindtap="loadMoreProducts">加载更多</view>
+      <view wx:else class="pager__text">已显示全部 {{productTotal}} 件商品</view>
+    </view>
+  </block>
+
+  <block wx:elif="{{tab == 'categories'}}">
+    <view class="card admin-category-add">
+      <view class="section-title">新增分类</view>
+      <view class="admin-category-add__form">
+        <input
+          class="input admin-category-add__input"
+          value="{{categoryName}}"
+          bindinput="onCategoryName"
+          maxlength="40"
+          placeholder="例如：水果、饮品"
+          placeholder-class="input-placeholder"
+        />
+        <button
+          class="btn btn--sm admin-category-add__btn"
+          bindtap="addCategory"
+          loading="{{categoryBusy}}"
+          disabled="{{categoryBusy}}"
+        >添加</button>
+      </view>
+    </view>
+
+    <view class="section-head">
+      <view class="section-title">全部分类</view>
+      <view class="muted">{{categories.length}} 个</view>
+    </view>
+
+    <view wx:if="{{!categories.length}}" class="empty">
+      <view class="empty__icon">🏷️</view>
+      <view class="empty__title">还没有分类</view>
+      <view class="empty__text">先创建一个分类，再上架商品</view>
+    </view>
+
+    <view wx:else class="admin-categories">
+      <view wx:for="{{categories}}" wx:key="id" class="admin-category">
+        <view class="admin-category__name">{{item.emoji}} {{item.name}}</view>
+        <view class="admin-category__actions">
+          <text class="admin-category__action" data-id="{{item.id}}" bindtap="openCategoryRename">改名</text>
+          <text class="admin-category__action admin-category__action--danger" data-id="{{item.id}}" bindtap="deleteCategory">删除</text>
+        </view>
+      </view>
+    </view>
+    <view class="note admin-note">被商品引用的分类不能删除；修改名称会同步到商品展示。</view>
+  </block>
+
+  <block wx:elif="{{tab == 'redeem'}}">
+    <view class="card redeem-card">
+      <view class="section-title">提货核销</view>
+      <view class="muted redeem-card__hint">输入 16 位提货码，核销后订单变为已完成。</view>
+      <input
+        class="input redeem-input"
+        value="{{redeemCode}}"
+        bindinput="onRedeemInput"
+        maxlength="16"
+        placeholder="例如：0123456789ABCDEF"
+        placeholder-class="input-placeholder"
+      />
+      <button
+        class="btn btn--block"
+        bindtap="redeem"
+        loading="{{redeemBusy}}"
+        disabled="{{redeemBusy}}"
+      >确认核销</button>
+    </view>
+
+    <view wx:if="{{redeemResult}}" class="redeem-result fade-in">
+      <view class="redeem-result__head">
+        <view class="badge badge--ok">{{redeemResult.statusText}}</view>
+        <text class="muted">{{redeemResult.timeText}}</text>
+      </view>
+      <view class="redeem-result__name">{{redeemResult.recipient}} · {{redeemResult.phone}}</view>
+      <view class="redeem-result__lines">
+        <view
+          wx:for="{{redeemResult.items}}"
+          wx:for-item="line"
+          wx:key="product_id"
+          class="redeem-result__line"
+        >
+          <text class="redeem-result__line-name">{{line.product_name}} × {{line.quantity}}</text>
+          <text>¥{{line.lineTotal}}</text>
+        </view>
+      </view>
+      <view class="redeem-result__total">合计 <text class="price">¥{{redeemResult.amountText}}</text></view>
+      <view class="redeem-result__code">提货码 {{redeemResult.pickupCode}}</view>
+    </view>
+
+    <view class="section-head">
+      <view class="section-title">待提货订单</view>
+      <view class="muted">{{paidOrders.length}} 笔</view>
+    </view>
+
+    <view wx:if="{{paidLoading}}" class="empty">
+      <view class="empty__text">正在加载待提货订单…</view>
+    </view>
+    <view wx:elif="{{paidError}}" class="empty">
+      <view class="empty__icon">🌧️</view>
+      <view class="empty__title">待提货订单加载失败</view>
+      <view class="empty__action">
+        <view class="btn btn--ghost btn--sm" bindtap="loadPaidOrders">重新加载</view>
+      </view>
+    </view>
+    <view wx:elif="{{!paidOrders.length}}" class="empty">
+      <view class="empty__icon">✅</view>
+      <view class="empty__title">暂无待提货订单</view>
+      <view class="empty__text">用户支付后会出现在这里</view>
+    </view>
+    <view wx:else class="paid-orders">
+      <view wx:for="{{paidOrders}}" wx:key="id" class="paid-order">
+        <view class="paid-order__top">
+          <text class="paid-order__code">{{item.pickupCode}}</text>
+          <text class="muted">{{item.timeText}}</text>
+        </view>
+        <view class="paid-order__meta">{{item.recipient}} · {{item.count}} 件 · ¥{{item.amountText}}</view>
+        <view class="paid-order__actions">
+          <text class="paid-order__action" data-code="{{item.pickupCode}}" bindtap="fillPickup">填入提货码</text>
+          <text class="paid-order__action" data-code="{{item.pickupCode}}" bindtap="copyCode">复制</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:elif="{{tab == 'users'}}">
+    <view class="admin-meta">
+      <text>已加载 {{users.length}} 位用户</text>
+      <text>每页 50 位</text>
+    </view>
+
+    <view wx:if="{{usersLoading && !users.length}}" class="admin-skeletons">
+      <view wx:for="{{skeletons}}" wx:key="*this" class="admin-user admin-user--skeleton">
+        <view class="skeleton admin-skeleton__line"></view>
+        <view class="skeleton admin-skeleton__line admin-skeleton__line--short"></view>
+      </view>
+    </view>
+
+    <view wx:elif="{{usersError && !users.length}}" class="empty">
+      <view class="empty__icon">🌧️</view>
+      <view class="empty__title">用户加载失败</view>
+      <view class="empty__text">检查后端或管理员登录状态</view>
+      <view class="empty__action">
+        <view class="btn btn--ghost btn--sm" bindtap="retryUsers">重新加载</view>
+      </view>
+    </view>
+
+    <view wx:elif="{{!users.length}}" class="empty">
+      <view class="empty__icon">👥</view>
+      <view class="empty__title">暂无用户</view>
+    </view>
+
+    <view wx:else class="admin-users">
+      <view wx:for="{{users}}" wx:key="id" class="admin-user">
+        <view class="admin-user__top">
+          <view class="grow">
+            <view class="admin-user__name">
+              {{item.nickname || item.username}}
+              <text class="admin-user__username">@{{item.username}}</text>
+            </view>
+            <view class="admin-user__meta">ID {{item.id}} · {{item.roleText}}</view>
+          </view>
+          <view class="badge {{item.enabled ? 'badge--ok' : 'badge--muted'}}">{{item.enabled ? '正常' : '已停用'}}</view>
+        </view>
+        <view class="admin-user__bottom">
+          <view class="admin-user__balance">余额 <text class="price">¥{{item.balanceText}}</text></view>
+          <view class="admin-user__actions">
+            <text class="admin-user__action" data-id="{{item.id}}" bindtap="openRecharge">充值</text>
+            <text
+              wx:if="{{!item.isSelf}}"
+              class="admin-user__action {{item.enabled ? 'admin-user__action--danger' : ''}} {{usersBusyId == item.id ? 'is-disabled' : ''}}"
+              data-id="{{item.id}}"
+              bindtap="toggleUser"
+            >{{item.enabled ? '停用' : '启用'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{usersHasMore}}" class="pager">
+      <view class="btn btn--ghost btn--sm" bindtap="loadMoreUsers">加载更多用户</view>
+    </view>
+  </block>
+</view>
+
+<view wx:if="{{modal.open}}" class="admin-mask" catchtap="closeModal">
+  <view class="admin-sheet" catchtap="noop">
+    <view class="admin-sheet__head">
+      <view class="grow">
+        <view class="section-title">{{modal.title}}</view>
+        <view class="muted admin-sheet__hint">{{modal.hint}}</view>
+      </view>
+      <text class="admin-sheet__close" bindtap="closeModal">✕</text>
+    </view>
+    <view class="field">
+      <view class="field__label">{{modal.label}}</view>
+      <input
+        class="input"
+        type="{{modal.inputType}}"
+        value="{{modal.value}}"
+        bindinput="modalInput"
+        focus="{{modal.open}}"
+        placeholder="{{modal.placeholder}}"
+        placeholder-class="input-placeholder"
+      />
+    </view>
+    <view class="admin-sheet__actions">
+      <button class="btn btn--ghost btn--sm grow" bindtap="closeModal">取消</button>
+      <button
+        class="btn btn--sm grow"
+        bindtap="confirmModal"
+        loading="{{modal.busy}}"
+        disabled="{{modal.busy}}"
+      >{{modal.type == 'category' ? '保存' : '确认'}}</button>
+    </view>
+  </view>
+</view>

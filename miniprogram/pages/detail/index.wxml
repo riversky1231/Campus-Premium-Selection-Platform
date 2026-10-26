@@ -1,1 +1,113 @@
-<view class="wrap" wx:if="{{product}}"><view class="eyebrow">CAMPUS SELECTION</view><view class="art" style="height:400rpx;font-size:160rpx">{{product.categoryId==1?'🥨':product.categoryId==2?'🍋':'🧺'}}</view><view class="title">{{product.name}}</view><view class="price">¥{{product.price}}</view><view class="stock">剩余 {{product.stock}} 件 · 校园自提</view><view class="card" style="margin-top:32rpx">{{product.description}}</view><view class="label">购买数量</view><slider min="1" max="{{product.stock>99?99:product.stock||1}}" value="{{quantity}}" show-value="true" bindchange="quantity" activeColor="#254e3b"/><button bindtap="add" loading="{{busy}}" disabled="{{busy||product.stock==0}}">{{product.stock==0?'暂时售罄':'加入购物车'}}</button></view><view wx:if="{{error}}" class="wrap"><button bindtap="retry">重新加载</button></view>
+<view wx:if="{{loading}}" class="page">
+  <view class="skeleton detail-skeleton__art"></view>
+  <view class="skeleton detail-skeleton__title"></view>
+  <view class="skeleton detail-skeleton__line"></view>
+  <view class="skeleton detail-skeleton__line detail-skeleton__line--short"></view>
+</view>
+
+<view wx:elif="{{error}}" class="page">
+  <view class="empty">
+    <view class="empty__icon">🫙</view>
+    <view class="empty__title">这件好物不见了</view>
+    <view class="empty__text">可能已经下架，或链接不正确</view>
+    <view class="empty__action">
+      <view class="btn btn--ghost btn--sm" bindtap="retry">重新加载</view>
+      <view class="btn btn--sm detail-empty__home" bindtap="backHome">回到首页</view>
+    </view>
+  </view>
+</view>
+
+<view wx:elif="{{product}}" class="page page--bar">
+  <view class="detail-art">
+    <view class="detail-art__orb"></view>
+    <text class="detail-art__emoji">{{product.emoji}}</text>
+    <view class="detail-art__category">{{product.categoryName}}</view>
+  </view>
+
+  <view class="detail-head">
+    <view class="eyebrow">CAMPUS SELECTION</view>
+    <view class="page-title detail-title">{{product.name}}</view>
+    <view class="detail-price-row">
+      <view class="price price--xl"><text class="detail-yen">¥</text>{{product.priceText}}</view>
+      <view class="badge {{product.stock > 0 ? 'badge--ok' : 'badge--muted'}}">
+        {{product.stock > 0 ? '现货 ' + product.stock + ' 件' : '暂时售罄'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="detail-tags">
+    <view class="detail-tag">🏫 校园自提</view>
+    <view class="detail-tag">📦 库存实时校验</view>
+    <view class="detail-tag">🧾 下单可取消</view>
+  </view>
+
+  <view class="card detail-desc">
+    <view class="section-title">好物说明</view>
+    <view class="detail-desc__text">{{product.description || '这件好物还没有额外说明，欢迎到自提点挑选。'}}</view>
+  </view>
+
+  <view class="card detail-qty">
+    <view class="row row--between">
+      <view>
+        <view class="section-title">购买数量</view>
+        <view class="muted">单次最多 99 件，库存 {{product.stock}} 件</view>
+      </view>
+      <view class="stepper">
+        <view
+          class="stepper__btn {{quantity <= 1 ? 'is-disabled' : ''}}"
+          data-delta="{{-1}}"
+          bindtap="step"
+        >−</view>
+        <view class="stepper__num">{{quantity}}</view>
+        <view
+          class="stepper__btn {{quantity >= maxQuantity ? 'is-disabled' : ''}}"
+          data-delta="{{1}}"
+          bindtap="step"
+        >+</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="detail-notes">
+    <view class="detail-note">
+      <text class="detail-note__icon">🏫</text>
+      <view class="grow">
+        <view class="detail-note__title">到点自提</view>
+        <view class="muted">支付成功后凭提货码到自提点取货</view>
+      </view>
+    </view>
+    <view class="detail-note">
+      <text class="detail-note__icon">⏱️</text>
+      <view class="grow">
+        <view class="detail-note__title">15 分钟内支付</view>
+        <view class="muted">超时未支付会自动关闭并释放库存</view>
+      </view>
+    </view>
+    <view class="detail-note">
+      <text class="detail-note__icon">💳</text>
+      <view class="grow">
+        <view class="detail-note__title">余额支付</view>
+        <view class="muted">演示环境使用校园账户余额，不接入真实微信支付</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="detail-footnote">价格与库存以提交订单时服务端校验为准。</view>
+
+  <view class="bottom-bar detail-bar">
+    <view class="detail-bar__price">
+      <view class="price"><text class="detail-yen">¥</text>{{product.priceText}}</view>
+      <view class="detail-bar__hint">校园自提</view>
+    </view>
+    <view class="detail-bar__cart" bindtap="openCart" hover-class="detail-bar__cart--hover">
+      <text class="detail-bar__cart-icon">🛒</text>
+      <text class="detail-bar__cart-label">购物车</text>
+    </view>
+    <button
+      class="btn detail-bar__btn"
+      bindtap="add"
+      loading="{{adding}}"
+      disabled="{{adding || product.stock == 0}}"
+    >{{product.stock == 0 ? '暂时售罄' : '加入购物车'}}</button>
+  </view>
+</view>

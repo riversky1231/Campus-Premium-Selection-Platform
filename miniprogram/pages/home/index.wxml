@@ -1,1 +1,149 @@
-<view class="wrap"><view class="eyebrow">CAMPUS / DAILY GOODS</view><view class="row"><view class="title">把小日子<view>装进购物袋。</view></view><view><text bindtap="cart" class="muted">购物车 · </text><text bindtap="orders" class="muted">订单 · </text><text bindtap="admin" class="muted">管理 ↗</text></view></view><view class="hero"><view style="font-size:38rpx;font-weight:bold">课间好物 · 顺路自提</view><view class="muted" style="margin-top:18rpx">零食、饮品、日用品，一站选好。</view></view><input placeholder="搜索今天想买的好物" confirm-type="search" bindconfirm="search"/><scroll-view scroll-x="true" class="chips"><text class="chip {{categoryId==''?'active':''}}" data-id="" bindtap="category">全部</text><text wx:for="{{categories}}" wx:key="id" class="chip {{categoryId==item.id?'active':''}}" data-id="{{item.id}}" bindtap="category">{{item.name}}</text></scroll-view><view class="grid"><view wx:for="{{items}}" wx:key="id" class="card" data-id="{{item.id}}" bindtap="detail"><view class="art">{{item.categoryId==1?'🥨':item.categoryId==2?'🍋':'🧺'}}</view><view class="name">{{item.name}}</view><view class="stock">库存 {{item.stock}} 件</view><view class="price">¥{{item.price}}</view></view></view><view wx:if="{{loading}}" class="empty">正在挑选好物…</view><button wx:if="{{error}}" bindtap="retry">加载失败，点击重试</button><view wx:if="{{!loading && !error && !items.length}}" class="empty">暂时没有找到商品</view><button wx:if="{{hasMore}}" class="secondary" bindtap="more" loading="{{loading}}">再看一些</button><view class="footer">校园优选 / 好物就在身边</view></view>
+<view class="page home">
+  <view class="topbar">
+    <view class="brand">
+      <view class="brand__mark">优</view>
+      <view>
+        <view class="brand__name">校园优选</view>
+        <view class="brand__meta">CAMPUS DAILY GOODS</view>
+      </view>
+    </view>
+    <view class="quick">
+      <view class="quick__btn" bindtap="openCart" hover-class="quick__btn--hover">
+        <text class="quick__icon">🛒</text>
+        <view wx:if="{{cartCount}}" class="quick__badge">{{cartCount > 99 ? '99+' : cartCount}}</view>
+      </view>
+      <view class="quick__btn" bindtap="openOrders" hover-class="quick__btn--hover">
+        <text class="quick__icon">🧾</text>
+      </view>
+      <view class="quick__btn" bindtap="openAdmin" hover-class="quick__btn--hover">
+        <text class="quick__icon">⚙️</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="hero">
+    <view class="hero__orb hero__orb--one"></view>
+    <view class="hero__orb hero__orb--two"></view>
+    <view class="hero__eyebrow">{{greeting}} · 顺路自提</view>
+    <view class="hero__title">把小日子，</view>
+    <view class="hero__title hero__title--accent">装进购物袋。</view>
+    <view class="hero__desc">零食、饮品、日用品，一站选好，下课后顺路带走。</view>
+    <view class="hero__stats">
+      <view class="hero__stat">
+        <text class="hero__num">{{total}}</text>
+        <text class="hero__label">件在售</text>
+      </view>
+      <view class="hero__stat">
+        <text class="hero__num">{{categories.length}}</text>
+        <text class="hero__label">个分类</text>
+      </view>
+      <view class="hero__tag">校园自提</view>
+    </view>
+  </view>
+
+  <view class="search">
+    <text class="search__icon">🔍</text>
+    <input
+      class="search__input"
+      value="{{keyword}}"
+      placeholder="搜索今天想买的好物"
+      placeholder-class="input-placeholder"
+      maxlength="100"
+      confirm-type="search"
+      bindinput="onKeyword"
+      bindconfirm="onSearch"
+    />
+    <text wx:if="{{keyword}}" class="search__clear" bindtap="clearKeyword">✕</text>
+  </view>
+
+  <scroll-view class="chips" scroll-x="true" show-scrollbar="{{false}}">
+    <view class="chips__inner">
+      <view
+        class="chip {{categoryId == '' ? 'chip--active' : ''}}"
+        data-id=""
+        bindtap="selectCategory"
+      >全部</view>
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="chip {{categoryId == item.id ? 'chip--active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectCategory"
+      >{{item.emoji}} {{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="section-head">
+    <view>
+      <view class="section-title">{{keyword ? '搜索结果' : '今日好物'}}</view>
+      <view class="muted">{{total}} 件可选 · 校园自提</view>
+    </view>
+    <view wx:if="{{keyword}}" class="section-link" bindtap="clearKeyword">清空搜索</view>
+  </view>
+
+  <view wx:if="{{loading && !items.length}}" class="grid">
+    <view wx:for="{{skeletons}}" wx:key="*this" class="product-skeleton">
+      <view class="skeleton product-skeleton__art"></view>
+      <view class="skeleton product-skeleton__line product-skeleton__line--short"></view>
+      <view class="skeleton product-skeleton__line"></view>
+    </view>
+  </view>
+
+  <view wx:if="{{items.length}}" class="grid">
+    <view
+      wx:for="{{items}}"
+      wx:key="id"
+      class="product fade-in"
+      data-id="{{item.id}}"
+      bindtap="openDetail"
+      hover-class="product--hover"
+    >
+      <view class="product__art">
+        <text class="product__emoji">{{item.emoji}}</text>
+        <view wx:if="{{item.soldOut}}" class="product__mask">已售罄</view>
+      </view>
+      <view class="product__body">
+        <view class="product__name">{{item.name}}</view>
+        <view class="product__meta">
+          <text wx:if="{{item.soldOut}}" class="product__stock product__stock--out">补货中</text>
+          <text wx:elif="{{item.lowStock}}" class="product__stock product__stock--low">仅剩 {{item.stock}} 件</text>
+          <text wx:else class="product__stock">库存 {{item.stock}}</text>
+        </view>
+        <view class="product__bottom">
+          <view class="price"><text class="product__yen">¥</text>{{item.priceText}}</view>
+          <view
+            class="product__add {{item.soldOut ? 'is-disabled' : ''}}"
+            data-id="{{item.id}}"
+            catchtap="quickAdd"
+          >+</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{error && !items.length}}" class="empty">
+    <view class="empty__icon">🌧️</view>
+    <view class="empty__title">没能连上货架</view>
+    <view class="empty__text">检查后端是否启动，或稍后再试</view>
+    <view class="empty__action">
+      <view class="btn btn--ghost btn--sm" bindtap="retry">重新加载</view>
+    </view>
+  </view>
+
+  <view wx:elif="{{!loading && !items.length}}" class="empty">
+    <view class="empty__icon">{{keyword ? '🔍' : '🧺'}}</view>
+    <view class="empty__title">{{keyword ? '没有找到相关好物' : '货架还在补货'}}</view>
+    <view class="empty__text">{{keyword ? '换个关键词试试，或看看全部分类' : '过一会儿再来看看吧'}}</view>
+    <view wx:if="{{keyword}}" class="empty__action">
+      <view class="btn btn--ghost btn--sm" bindtap="clearKeyword">查看全部好物</view>
+    </view>
+  </view>
+
+  <view wx:if="{{items.length}}" class="pager">
+    <view wx:if="{{loadingMore}}" class="pager__text">正在加载…</view>
+    <view wx:elif="{{hasMore}}" class="btn btn--ghost btn--sm" bindtap="loadMore">再看一些</view>
+    <view wx:else class="pager__text">已经到底啦 · 共 {{total}} 件</view>
+  </view>
+
+  <view class="footer">CAMPUS PREMIUM SELECTION · 好物就在身边</view>
+</view>

@@ -2,6 +2,7 @@ package cn.campus.order;
 import java.math.BigDecimal;
 import java.util.*;
 public final class Contracts {
+ @com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
  public record Identity(String userId,String role){}
  public record Product(Long id,Long categoryId,String name,String description,BigDecimal price,Integer stock,Boolean onSale){}
  public record Stock(String requestId,long productId,int quantity){}

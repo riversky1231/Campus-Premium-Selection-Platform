@@ -1,0 +1,104 @@
+.editor-head {
+  margin-bottom: 26rpx;
+}
+
+.editor-skeleton {
+  padding: 26rpx;
+  border-radius: 28rpx;
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+}
+
+.editor-skeleton__line {
+  height: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.editor-skeleton__line--short {
+  width: 48%;
+}
+
+.editor-skeleton__block {
+  height: 150rpx;
+  margin: 24rpx 0;
+}
+
+.editor-card {
+  margin-bottom: 18rpx;
+}
+
+.editor-card .field:last-child {
+  margin-bottom: 2rpx;
+}
+
+.editor-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editor-picker__value {
+  font-size: 27rpx;
+  color: var(--ink);
+}
+
+.editor-picker__arrow {
+  font-size: 22rpx;
+  color: var(--muted);
+}
+
+.editor-price {
+  display: flex;
+  align-items: center;
+  height: 92rpx;
+  padding: 0 24rpx;
+  background: #fbf8ee;
+  border: 1rpx solid var(--line);
+  border-radius: 18rpx;
+}
+
+.editor-price__unit {
+  margin-right: 8rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.editor-price__input {
+  flex: 1;
+  height: 90rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.editor-note {
+  margin-top: 20rpx;
+}
+
+.editor-switch {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  margin-bottom: 18rpx;
+}
+
+.editor-switch__title {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.editor-tip {
+  margin-top: 6rpx;
+}
+
+.editor-bar__hint {
+  flex: 1;
+  font-size: 22rpx;
+  color: var(--muted);
+}
+
+.editor-bar__save {
+  width: 320rpx;
+  height: 88rpx;
+}

@@ -1,1 +1,20 @@
-{"pages": ["pages/home/index", "pages/detail/index", "pages/login/index", "pages/cart/index", "pages/orders/index", "pages/admin/index", "pages/editor/index"], "window": {"navigationBarTitleText": "校园优选", "navigationBarBackgroundColor": "#f5f3e9", "navigationBarTextStyle": "black", "backgroundColor": "#f5f3e9"}, "style": "v2"}
+{
+  "pages": [
+    "pages/home/index",
+    "pages/detail/index",
+    "pages/login/index",
+    "pages/cart/index",
+    "pages/orders/index",
+    "pages/admin/index",
+    "pages/editor/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "校园优选",
+    "navigationBarBackgroundColor": "#f6f3e9",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f6f3e9",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

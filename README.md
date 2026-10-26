@@ -2,7 +2,7 @@
 
 校园优选：校园团购与自提平台。
 
-面向校园团购与自提的后端，包含用户、商品、订单三个业务服务、统一网关和Spring Boot Admin监控。支付为余额模拟支付，不对接真实微信支付。原生小程序保留原有商品页面，本轮新增的用户、订单能力以API提供。
+面向校园团购与自提的全栈项目，包含用户、商品、订单三个业务服务、统一网关、Spring Boot Admin监控和微信小程序客户端。支付为余额模拟支付，不对接真实微信支付。小程序已覆盖商品浏览、登录注册、购物车、订单和管理台。
 
 ## 项目入口
 
@@ -87,6 +87,8 @@ MySQL启动时自动执行database/init.sql，创建三个数据库、业务表�
 
 Docker构建启用Seata和监控客户端；生产下单、支付、取消由TradingFacade发起AT全局事务，Feign转发TX_XID，三个服务各有undo_log。超时订单通过RabbitMQ延迟/死信队列关单，同时有30秒数据库扫描补偿。支付通知采用数据库outbox、发布确认、持久消息及事件ID幂等消费；失败消息进入campus.failed。
 
+容器内的 app 用户没有可写 home，Nacos 客户端默认把服务发现缓存写到 `$HOME`，会导致 order-service 调用 user-service 时返回 503。`backend/Dockerfile` 已通过 `JAVA_TOOL_OPTIONS=-DJM.SNAPSHOT.PATH=/tmp` 将缓存放到可写目录；自定义镜像或直接运行 jar 时需保留等价配置。
+
 ## 接口和数据库
 
 - [公共接口文档](docs/PUBLIC-API.md)：面向客户端的鉴权、参数、响应模型、分页与联调示例。
@@ -96,15 +98,33 @@ Docker构建启用Seata和监控客户端；生产下单、支付、取消由Tra
 - [验证记录](docs/BACKEND-VERIFICATION.md)：已通过与未通过的检查。
 - [Seata验收](docs/SEATA.md)：全局回滚测试流程。
 
-所有用户API使用`Authorization: Bearer <登录返回的token>`。小程序应将baseUrl改为网关8080，并分别保存用户token/管理员登录返回的token。原管理页可输入管理员登录后的token。内部令牌只供服务间调用，不得写入小程序。
+所有用户API使用`Authorization: Bearer <登录返回的token>`。小程序将网关地址配置在`miniprogram/utils/config.js`，用户与管理员会话分别保存；管理台使用ADMIN账号登录，不再需要手工粘贴token。内部令牌只供服务间调用，不得写入小程序。
 
 微信登录入口POST /api/auth/wx-login，传wx.login得到的code。设置WX_APPID/WX_SECRET后容器启动会转为服务配置；未配置返回503，不伪造微信登录。HTTPS域名和微信合法域名配置需要按实际部署环境设置。
+
+## 小程序端
+
+小程序入口在`miniprogram`，使用微信开发者工具导入。网关地址在`miniprogram/utils/config.js`的`BASE_URL`：本机调试用`http://127.0.0.1:8080`，真机用电脑局域网地址，正式环境用已配置的HTTPS域名；本机调试请在开发者工具「详情-本地设置」勾选“不校验合法域名、web-view（业务域名）、TLS版本以及HTTPS证书”。
+
+| 页面 | 能力 |
+|---|---|
+| 首页 | 搜索防抖、分类筛选、下拉刷新、上拉分页、库存/售罄、快捷加购 |
+| 详情 | 库存与数量步进、加购、异常重试 |
+| 登录/注册 | 表单校验、密码可见、演示账号、登录后回跳 |
+| 购物车 | 数量调整/删除、地址增删改、余额提示、幂等下单 |
+| 订单 | 状态筛选、支付倒计时、支付/取消、提货码复制 |
+| 管理台 | ADMIN登录、商品上下架/补库存、分类管理、提货核销、用户充值/停用 |
+| 商品编辑 | 新建/编辑、分类选择、价格库存校验 |
+
+管理接口需要ADMIN角色，演示环境可使用admin演示账号（以实际数据库为准）。请求层统一处理401、超时和错误提示。
 
 ## 当前验收状态
 
 商品服务原7项Maven测试通过。用户4项和订单4项测试通过本地缓存依赖运行；核心业务另外12组真实H2/事务/权限检查通过。Compose及所有YAML/XML/PowerShell静态检查通过。
 
 完整聚合构建因新增Seata/OpenFeign/RabbitMQ/Gateway/Admin依赖下载受限，尚未通过；这不等于全套后端已成功运行。Docker/MySQL/Redis/Nacos/RabbitMQ/Seata网络链路与微信授权仍需实际环境验收。demo跨服务使用尽力补偿，不提供进程崩溃后的分布式原子性；生产模式应以Seata故障注入结果验收。
+
+小程序端通过JS语法、JSON解析、WXML标签/插值、WXSS括号静态检查，并用模拟wx层跑通首页、详情、购物车地址、登录和管理台核心流程；尚未在微信开发者工具或真机做视觉与网络验收。
 
 ## 配置与常见问题
 
@@ -123,6 +143,6 @@ Linux可复制.env.example为.env并填写强随机值；NACOS_AUTH_TOKEN需为�
 
 Maven下载失败时检查本机网络、代理和settings.xml镜像配置。启动脚本检查8080–8083端口并保留其他应用进程；日志在backend-run。数据库SQL仅在新数据卷初始化时执行，已有数据库需备份后迁移。
 
-微信开发者工具导入miniprogram，在app.js设置网关baseUrl；真机使用电脑局域网地址或HTTPS域名，不能使用localhost。当前页面覆盖商品模块，用户、订单等新增后端能力通过API提供，完整客户端界面需继续开发。
+微信开发者工具导入miniprogram，在`miniprogram/utils/config.js`设置网关`BASE_URL`；真机使用电脑局域网地址或HTTPS域名，不能使用localhost。小程序已覆盖商品、用户、购物车、订单和管理台；微信登录仍需配置WX_APPID/WX_SECRET。
 
 仓库保留源码、正式测试、SQL、部署配置和文档；构建产物、日志、凭证、IDE私有配置及临时工作记录不提交。

@@ -1,1 +1,192 @@
-<view class="wrap"><view class="eyebrow">CART</view><view class="title">购物车</view><view wx:if="{{!items.length}}" class="empty">购物车还是空的，去挑选好物吧</view><view wx:for="{{items}}" wx:key="product.id" class="card"><view class="row"><view><view class="name">{{item.product.name}}</view><view class="price">¥{{item.product.price}}</view></view><view class="row"><button class="secondary" data-id="{{item.product.id}}" data-delta="{{-1}}" bindtap="change">－</button><text>{{item.quantity}}</text><button class="secondary" data-id="{{item.product.id}}" data-delta="{{1}}" bindtap="change">＋</button></view></view></view><view class="price">合计 ¥{{total}}</view><view class="label">收货地址</view><view wx:for="{{addresses}}" wx:key="id" class="card" data-id="{{item.id}}" bindtap="pick"><view class="row"><view><view class="name">{{item.recipient}} {{item.phone}}</view><view class="stock">{{item.detail}}</view></view><text class="chip {{addressId==item.id?'active':''}}">{{addressId==item.id?'已选':'选择'}}</text></view></view><view class="card"><view class="label">新增地址</view><input placeholder="收货人（1-40字）" value="{{form.recipient}}" data-field="recipient" bindinput="field"/><input placeholder="手机号" value="{{form.phone}}" data-field="phone" bindinput="field"/><input placeholder="自提点与楼栋" value="{{form.detail}}" data-field="detail" bindinput="field"/><button class="secondary" bindtap="addAddress">保存地址</button></view><button bindtap="checkout" loading="{{busy}}" disabled="{{busy||!items.length}}">提交订单</button><button class="secondary" bindtap="orders">查看我的订单</button></view>
+<view class="page {{items.length && !error ? 'page--bar' : ''}}">
+  <view class="cart-head">
+    <view>
+      <view class="eyebrow">YOUR CART</view>
+      <view class="page-title">购物车</view>
+      <view class="page-subtitle">{{items.length ? '共 ' + count + ' 件 · 合计 ¥' + total : '把喜欢的好物先放进来'}}</view>
+    </view>
+    <view class="cart-head__link" bindtap="openOrders">我的订单 →</view>
+  </view>
+
+  <view wx:if="{{loading && !items.length}}" class="cart-skeleton">
+    <view wx:for="{{skeletons}}" wx:key="*this" class="cart-skeleton__row">
+      <view class="skeleton cart-skeleton__art"></view>
+      <view class="grow">
+        <view class="skeleton cart-skeleton__line"></view>
+        <view class="skeleton cart-skeleton__line cart-skeleton__line--short"></view>
+        <view class="skeleton cart-skeleton__line cart-skeleton__line--tiny"></view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:elif="{{error && !items.length}}" class="empty">
+    <view class="empty__icon">🌧️</view>
+    <view class="empty__title">购物车加载失败</view>
+    <view class="empty__text">检查网络后重试</view>
+    <view class="empty__action">
+      <view class="btn btn--ghost btn--sm" bindtap="retry">重新加载</view>
+    </view>
+  </view>
+
+  <view wx:elif="{{!loading && !items.length}}" class="empty">
+    <view class="empty__icon">🧺</view>
+    <view class="empty__title">购物车还是空的</view>
+    <view class="empty__text">去挑几件课间补给吧</view>
+    <view class="empty__action">
+      <view class="btn btn--sm" bindtap="goShopping">去逛逛</view>
+    </view>
+  </view>
+
+  <block wx:else>
+    <view class="cart-list">
+      <view
+        wx:for="{{items}}"
+        wx:key="id"
+        class="cart-item fade-in {{updatingId == item.id ? 'cart-item--updating' : ''}}"
+      >
+        <view class="cart-item__art" data-id="{{item.id}}" catchtap="openProduct">
+          <text class="cart-item__emoji">{{item.emoji}}</text>
+        </view>
+        <view class="cart-item__body">
+          <view class="cart-item__top">
+            <view class="cart-item__name">{{item.name}}</view>
+            <view class="cart-item__remove" data-id="{{item.id}}" catchtap="removeItem">删除</view>
+          </view>
+          <view class="cart-item__meta">
+            <text class="price cart-item__price">¥{{item.priceText}}</text>
+            <text wx:if="{{item.soldOut}}" class="cart-item__warn">已售罄</text>
+            <text wx:elif="{{item.overStock}}" class="cart-item__warn">库存仅剩 {{item.stock}} 件</text>
+            <text wx:else class="cart-item__stock">库存 {{item.stock}} 件</text>
+          </view>
+          <view class="cart-item__bottom">
+            <view class="stepper">
+              <view
+                class="stepper__btn {{item.quantity <= 1 ? 'is-disabled' : ''}}"
+                data-id="{{item.id}}"
+                data-delta="{{-1}}"
+                bindtap="changeQuantity"
+              >−</view>
+              <view class="stepper__num">{{item.quantity}}</view>
+              <view
+                class="stepper__btn {{item.quantity >= item.maxQuantity ? 'is-disabled' : ''}}"
+                data-id="{{item.id}}"
+                data-delta="{{1}}"
+                bindtap="changeQuantity"
+              >+</view>
+            </view>
+            <view class="cart-item__line">¥{{item.lineTotal}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="wallet {{balanceEnough ? '' : 'wallet--warn'}}">
+      <text class="wallet__icon">💳</text>
+      <view class="grow">
+        <view class="wallet__title">账户余额 {{walletLoaded ? '¥' + balance : '暂不可用'}}</view>
+        <view class="wallet__hint">{{walletHint}}</view>
+      </view>
+    </view>
+
+    <view class="section-head">
+      <view class="section-title">自提地址</view>
+      <view class="section-link" bindtap="openAddressForm">+ 新增地址</view>
+    </view>
+
+    <view
+      wx:for="{{addresses}}"
+      wx:key="id"
+      class="address {{addressId == item.id ? 'address--active' : ''}}"
+      data-id="{{item.id}}"
+      bindtap="pickAddress"
+    >
+      <view class="address__radio">
+        <view wx:if="{{addressId == item.id}}" class="address__dot"></view>
+      </view>
+      <view class="address__body">
+        <view class="address__name">
+          {{item.recipient}}
+          <text class="address__phone">{{item.phone}}</text>
+        </view>
+        <view class="address__detail">{{item.detail}}</view>
+      </view>
+      <view class="address__actions">
+        <text class="address__action" data-id="{{item.id}}" catchtap="editAddress">编辑</text>
+        <text class="address__action address__action--danger" data-id="{{item.id}}" catchtap="deleteAddress">删除</text>
+      </view>
+    </view>
+
+    <view wx:if="{{!addresses.length && !formOpen}}" class="address-empty">
+      <view class="address-empty__text">还没有自提地址，先添加一个吧</view>
+      <view class="btn btn--ghost btn--sm" bindtap="openAddressForm">添加地址</view>
+    </view>
+
+    <view wx:if="{{formOpen}}" class="card address-form fade-in">
+      <view class="row row--between">
+        <view class="section-title">{{editingId ? '编辑地址' : '新增地址'}}</view>
+        <text class="muted" bindtap="closeAddressForm">收起</text>
+      </view>
+      <view class="field">
+        <view class="field__label">自提人</view>
+        <input
+          class="input"
+          value="{{form.recipient}}"
+          data-field="recipient"
+          bindinput="field"
+          maxlength="40"
+          placeholder="例如：张同学"
+          placeholder-class="input-placeholder"
+        />
+      </view>
+      <view class="field">
+        <view class="field__label">手机号</view>
+        <input
+          class="input"
+          type="number"
+          value="{{form.phone}}"
+          data-field="phone"
+          bindinput="field"
+          maxlength="20"
+          placeholder="用于取货时核对"
+          placeholder-class="input-placeholder"
+        />
+      </view>
+      <view class="field">
+        <view class="field__label">自提点与楼栋</view>
+        <input
+          class="input"
+          value="{{form.detail}}"
+          data-field="detail"
+          bindinput="field"
+          maxlength="250"
+          placeholder="例如：一号宿舍楼下自提点"
+          placeholder-class="input-placeholder"
+        />
+      </view>
+      <view class="address-form__actions">
+        <button class="btn btn--ghost btn--sm grow" bindtap="closeAddressForm">取消</button>
+        <button
+          class="btn btn--sm grow"
+          bindtap="saveAddress"
+          loading="{{formBusy}}"
+          disabled="{{formBusy}}"
+        >保存地址</button>
+      </view>
+    </view>
+
+    <view class="note cart-note">提交订单后请在 15 分钟内完成余额支付，超时订单会自动关闭并释放库存。</view>
+  </block>
+</view>
+
+<view wx:if="{{items.length && !error}}" class="bottom-bar cart-bar">
+  <view class="cart-bar__summary">
+    <view class="cart-bar__label">合计 · {{count}} 件</view>
+    <view class="price price--lg">¥{{total}}</view>
+  </view>
+  <button
+    class="btn cart-bar__submit"
+    bindtap="checkout"
+    loading="{{busy}}"
+    disabled="{{busy}}"
+  >提交订单</button>
+</view>

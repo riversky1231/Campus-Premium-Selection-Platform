@@ -1,1 +1,88 @@
-<view class="wrap"><view class="eyebrow">ACCOUNT</view><view class="title">{{mode==='login'?'登录':'注册新账号'}}</view><view class="label">账号</view><input placeholder="4-32位字母、数字或下划线" value="{{username}}" data-field="username" bindinput="field"/><view class="label">密码</view><input password="true" placeholder="8-64位" value="{{password}}" data-field="password" bindinput="field"/><block wx:if="{{mode==='register'}}"><view class="label">昵称</view><input placeholder="1-60个字符" value="{{nickname}}" data-field="nickname" bindinput="field"/></block><button bindtap="submit" loading="{{busy}}" disabled="{{busy}}">{{mode==='login'?'登录':'注册并登录'}}</button><button class="secondary" bindtap="toggle">{{mode==='login'?'没有账号？去注册':'已有账号？去登录'}}</button></view>
+<view class="page login">
+  <view class="login-hero">
+    <view class="login-brand">
+      <view class="login-brand__mark">优</view>
+      <view>
+        <view class="login-brand__name">校园优选</view>
+        <view class="login-brand__meta">CAMPUS DAILY GOODS</view>
+      </view>
+    </view>
+    <view class="login-title">登录后，</view>
+    <view class="login-title login-title--accent">把好物带走。</view>
+    <view class="login-desc">校园自提 · 余额支付 · 订单随时可查</view>
+  </view>
+
+  <view class="login-card">
+    <view class="login-tabs">
+      <view
+        class="login-tab {{mode == 'login' ? 'login-tab--active' : ''}}"
+        data-mode="login"
+        bindtap="switchMode"
+      >登录</view>
+      <view
+        class="login-tab {{mode == 'register' ? 'login-tab--active' : ''}}"
+        data-mode="register"
+        bindtap="switchMode"
+      >注册</view>
+    </view>
+
+    <view wx:if="{{existingUser}}" class="login-existing">
+      <text>当前已登录：{{existingUser}}</text>
+      <text class="login-existing__link" bindtap="goHome">直接进入</text>
+    </view>
+
+    <view class="field">
+      <view class="field__label">账号</view>
+      <input
+        class="input"
+        value="{{username}}"
+        data-field="username"
+        bindinput="field"
+        maxlength="32"
+        placeholder="4-32 位字母、数字或下划线"
+        placeholder-class="input-placeholder"
+      />
+    </view>
+
+    <view class="field">
+      <view class="field__label">
+        <text>密码</text>
+        <text class="login-password-toggle" bindtap="togglePassword">{{showPassword ? '隐藏' : '显示'}}</text>
+      </view>
+      <input
+        class="input"
+        password="{{!showPassword}}"
+        value="{{password}}"
+        data-field="password"
+        bindinput="field"
+        maxlength="64"
+        placeholder="8-64 位"
+        placeholder-class="input-placeholder"
+      />
+    </view>
+
+    <view wx:if="{{mode == 'register'}}" class="field">
+      <view class="field__label">昵称</view>
+      <input
+        class="input"
+        value="{{nickname}}"
+        data-field="nickname"
+        bindinput="field"
+        maxlength="60"
+        placeholder="1-60 个字符，例如：张同学"
+        placeholder-class="input-placeholder"
+      />
+    </view>
+
+    <button
+      class="btn btn--block login-submit"
+      bindtap="submit"
+      loading="{{busy}}"
+      disabled="{{busy}}"
+    >{{mode == 'login' ? '登录' : '注册并登录'}}</button>
+
+    <view class="login-hint">首次使用请先注册学生账号；管理员请使用部署时配置的账号密码。</view>
+  </view>
+
+  <view class="login-back" bindtap="goHome">先随便逛逛 →</view>
+</view>
