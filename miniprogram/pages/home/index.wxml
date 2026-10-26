@@ -99,7 +99,8 @@
       hover-class="product--hover"
     >
       <view class="product__art">
-        <text class="product__emoji">{{item.emoji}}</text>
+        <image wx:if="{{item.imageUrl}}" class="product__image" src="{{item.imageUrl}}" mode="aspectFill" lazy-load="true" />
+        <text wx:else class="product__emoji">{{item.emoji}}</text>
         <view wx:if="{{item.soldOut}}" class="product__mask">已售罄</view>
       </view>
       <view class="product__body">

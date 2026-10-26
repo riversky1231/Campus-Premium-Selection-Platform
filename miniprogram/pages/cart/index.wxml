@@ -45,7 +45,8 @@
         class="cart-item fade-in {{updatingId == item.id ? 'cart-item--updating' : ''}}"
       >
         <view class="cart-item__art" data-id="{{item.id}}" catchtap="openProduct">
-          <text class="cart-item__emoji">{{item.emoji}}</text>
+          <image wx:if="{{item.imageUrl}}" class="cart-item__image" src="{{item.imageUrl}}" mode="aspectFill" />
+          <text wx:else class="cart-item__emoji">{{item.emoji}}</text>
         </view>
         <view class="cart-item__body">
           <view class="cart-item__top">

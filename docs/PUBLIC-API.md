@@ -72,15 +72,17 @@
 ```json
 {
   "id":1,"categoryId":1,"name":"苹果","description":"新鲜苹果",
-  "price":5.50,"stock":100,"onSale":true
+  "imageUrl":"https://images.pexels.com/photos/...","price":5.50,"stock":100,"onSale":true
 }
 ```
+
+`imageUrl` 是可空的商品图片 HTTPS 地址；未设置图片的商品返回 `null`。
 
 商品分页对象：
 
 ```json
 {
-  "items":[{"id":1,"categoryId":1,"name":"苹果","description":"新鲜苹果","price":5.50,"stock":100,"onSale":true}],
+  "items":[{"id":1,"categoryId":1,"name":"苹果","description":"新鲜苹果","imageUrl":"https://images.pexels.com/photos/...","price":5.50,"stock":100,"onSale":true}],
   "total":1,"page":1,"size":12
 }
 ```

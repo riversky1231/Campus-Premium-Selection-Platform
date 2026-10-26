@@ -20,7 +20,8 @@
 <view wx:elif="{{product}}" class="page page--bar">
   <view class="detail-art">
     <view class="detail-art__orb"></view>
-    <text class="detail-art__emoji">{{product.emoji}}</text>
+    <image wx:if="{{product.imageUrl}}" class="detail-art__image" src="{{product.imageUrl}}" mode="aspectFill" />
+    <text wx:else class="detail-art__emoji">{{product.emoji}}</text>
     <view class="detail-art__category">{{product.categoryName}}</view>
   </view>
 

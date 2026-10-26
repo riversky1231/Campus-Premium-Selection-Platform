@@ -14,6 +14,9 @@ public void setName(String value){this.name=value;}
 private String description;
 public String getDescription(){return description;}
 public void setDescription(String value){this.description=value;}
+private String imageUrl;
+public String getImageUrl(){return imageUrl;}
+public void setImageUrl(String value){this.imageUrl=value;}
 private java.math.BigDecimal price;
 public java.math.BigDecimal getPrice(){return price;}
 public void setPrice(java.math.BigDecimal value){this.price=value;}

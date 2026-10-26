@@ -5,7 +5,7 @@ MySQL 8入口init.sql（UTF-8），由Docker MySQL官方镜像在新数据卷首
 | 数据库 | 表 | 用途 |
 |---|---|---|
 | campus_product | category | 商品分类，名称唯一 |
-| campus_product | product | 价格、库存和上下架状态 |
+| campus_product | product | 商品信息、图片 URL、价格、库存和上下架状态 |
 | campus_product | stock_operation | 请求号唯一的库存操作，防重复和取消先到 |
 | campus_user | app_user | 账号、BCrypt密码、角色、余额、状态、微信openid |
 | campus_user | user_session | 登录令牌摘要与过期时间 |
@@ -27,4 +27,6 @@ MySQL 8入口init.sql（UTF-8），由Docker MySQL官方镜像在新数据卷首
 
 demo模式使用各模块src/main/resources/db/schema.sql创建独立H2内存库，生产模式不自动运行这些脚本。MySQL初始化数据只带商品示例，管理员由用户服务根据MARKET_ADMIN_PASSWORD首次创建，普通用户余额初始0。
 
-如已有数据库，请先备份并审核迁移；init.sql不是增量迁移脚本。
+新商品图片来自 Pexels 免费照片，来源清单见 [product-image-sources.md](product-image-sources.md)。小程序开发者工具关闭了域名校验；发布到微信线上前，需将 `images.pexels.com` 配置为下载文件合法域名，或将图片迁移到自有 HTTPS 域名。
+
+已有 MySQL 数据卷不会重新执行 `init.sql`。本次商品图片和分类增量由 `migrations/20261026_01_catalog_images.sql` 应用；脚本使用 UTF-8/utf8mb4，可重复运行，不重置库存和已有订单。后续数据库结构变更继续放在 `migrations/`，不要删除数据卷来套用新的 `init.sql`。

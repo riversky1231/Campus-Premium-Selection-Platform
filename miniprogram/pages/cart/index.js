@@ -78,6 +78,7 @@ Page({
         return {
           id: product.id,
           name: product.name,
+          imageUrl: product.imageUrl,
           price: price,
           priceText: money(price),
           stock: product.stock,

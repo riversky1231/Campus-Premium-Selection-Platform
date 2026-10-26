@@ -72,6 +72,12 @@
   background: linear-gradient(150deg, #edf0d9 0%, #e1e7ce 100%);
 }
 
+.cart-item__image {
+  width: 100%;
+  height: 100%;
+  border-radius: 20rpx;
+}
+
 .cart-item__emoji {
   font-size: 66rpx;
   line-height: 1;
