@@ -7,8 +7,8 @@
 
 <view wx:elif="{{error}}" class="page">
   <view class="empty">
-    <view class="empty__title">这件好物不见了</view>
-    <view class="empty__text">可能已经下架，或链接不正确</view>
+    <view class="empty__title">商品暂不可用</view>
+    <view class="empty__text">商品可能已下架，请返回商品列表查看</view>
     <view class="empty__action">
       <view class="btn btn--ghost btn--sm" bindtap="retry">重新加载</view>
       <view class="btn btn--sm detail-empty__home" bindtap="backHome">回到首页</view>
@@ -18,7 +18,6 @@
 
 <view wx:elif="{{product}}" class="page page--bar">
   <view class="detail-art">
-    <view class="detail-art__orb"></view>
     <image wx:if="{{product.imageUrl}}" class="detail-art__image" src="{{product.imageUrl}}" mode="aspectFill" />
     <text wx:else class="detail-art__emoji">{{product.emoji}}</text>
     <view class="detail-art__category">{{product.categoryName}}</view>
@@ -29,7 +28,7 @@
     <view class="detail-price-row">
       <view class="price price--xl"><text class="detail-yen">¥</text>{{product.priceText}}</view>
       <view class="badge {{product.stock > 0 ? 'badge--ok' : 'badge--muted'}}">
-        {{product.stock > 0 ? '现货 ' + product.stock + ' 件' : '暂时售罄'}}
+        {{product.stock > 0 ? (product.stock < 10 ? '仅剩 ' + product.stock + ' 件' : '现货') : '暂时无货'}}
       </view>
     </view>
   </view>
@@ -43,7 +42,7 @@
     <view class="row row--between">
       <view>
         <view class="section-title">购买数量</view>
-        <view class="muted">单次最多 99 件，库存 {{product.stock}} 件</view>
+        <view class="muted">单次最多购买 99 件</view>
       </view>
       <view class="stepper">
         <view
@@ -69,7 +68,7 @@
       <view class="detail-bar__hint">校内自提</view>
     </view>
     <view class="detail-bar__cart" bindtap="openCart" hover-class="detail-bar__cart--hover">
-      <text class="detail-bar__cart-icon">🛒</text>
+      <text class="detail-bar__cart-icon">袋</text>
       <text class="detail-bar__cart-label">购物车</text>
     </view>
     <button

@@ -16,6 +16,7 @@ public class AuthFilter implements GlobalFilter,Ordered {
  public int getOrder(){return -100;}
  public Mono<Void> filter(ServerWebExchange exchange,GatewayFilterChain chain){
   String path=exchange.getRequest().getURI().getRawPath();String method=exchange.getRequest().getMethod().name();
+  if(path.equals("/openapi.yml")||path.equals("/swagger-ui.html")||path.startsWith("/swagger-ui/")||path.startsWith("/webjars/")||path.startsWith("/v3/api-docs"))return chain.filter(exchange);
   if(!path.matches("(/[A-Za-z0-9_\\-]+)+/?"))return reject(exchange,400);
   if(path.startsWith("/api/internal/"))return reject(exchange,404);
   var clean=exchange.mutate().request(exchange.getRequest().mutate().headers(h->{h.remove("X-User-Id");h.remove("X-User-Role");h.remove("TX_XID");}).build()).build();

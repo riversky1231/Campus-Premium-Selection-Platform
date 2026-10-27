@@ -3,7 +3,6 @@
     <view class="brand">
       <view>
         <view class="brand__name">校园小店</view>
-        <view class="brand__meta">校内自提 · 下单后到店取货</view>
       </view>
     </view>
     <view class="quick">
@@ -21,12 +20,12 @@
   </view>
 
   <view class="home-intro">
-    <view class="home-intro__title">下课顺路，买点需要的</view>
-    <view class="home-intro__desc">零食、饮料和宿舍日用品，线上下单，校内自提。</view>
+    <view class="home-intro__label">校园自提</view>
+    <view class="home-intro__desc">选好商品后，到校内自提点取货</view>
   </view>
 
   <view class="search">
-    <text class="search__icon">搜索</text>
+    <view class="search__icon"></view>
     <input
       class="search__input"
       value="{{keyword}}"
@@ -38,6 +37,7 @@
       bindconfirm="onSearch"
     />
     <text wx:if="{{keyword}}" class="search__clear" bindtap="clearKeyword">✕</text>
+    <view class="search__submit" bindtap="onSearch">搜索</view>
   </view>
 
   <scroll-view class="chips" scroll-x="true" show-scrollbar="{{false}}">
@@ -90,7 +90,7 @@
       <view class="product__body">
         <view class="product__name">{{item.name}}</view>
         <view class="product__meta">
-          <text wx:if="{{item.soldOut}}" class="product__stock product__stock--out">补货中</text>
+          <text wx:if="{{item.soldOut}}" class="product__stock product__stock--out">暂时无货</text>
           <text wx:elif="{{item.lowStock}}" class="product__stock product__stock--low">仅剩 {{item.stock}} 件</text>
           <text wx:else class="product__stock">有货</text>
         </view>
@@ -118,7 +118,7 @@
     <view class="empty__title">{{keyword ? '没有找到相关商品' : '暂无在售商品'}}</view>
     <view class="empty__text">{{keyword ? '试试其他关键词或分类' : '之后再来看看'}}</view>
     <view wx:if="{{keyword}}" class="empty__action">
-      <view class="btn btn--ghost btn--sm" bindtap="clearKeyword">查看全部好物</view>
+      <view class="btn btn--ghost btn--sm" bindtap="clearKeyword">查看全部商品</view>
     </view>
   </view>
 

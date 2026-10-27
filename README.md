@@ -81,6 +81,8 @@ docker compose logs --tail 100 user product order gateway
 
 网关 http://localhost:8080，监控 http://localhost:8090（monitor账户，密码见.env）。仅网关和本机监控映射端口；MySQL、Redis、RabbitMQ、Nacos和Seata位于内部网络。Nacos初始化容器会把默认账户密码改为.env中的随机值，随后才启动业务服务。若更换已有Nacos的数据卷配置，应先确认已有密码。
 
+接口调试：启动后打开 http://localhost:8080/swagger-ui.html。Swagger UI 使用`docs/openapi.yml`中的公开网关接口定义；点击 Authorize 填入登录接口返回的token即可调试需要登录的接口，登录、注册和公开商品查询无需token。管理员接口仍需ADMIN账号登录。内部服务接口不包含在公开接口定义中。
+
 MySQL启动时自动执行database/init.sql，创建三个数据库、业务表、索引、undo_log、商品示例数据和campus账户授权。用户服务首次启动创建管理员。使用新的mysql-full-data命名卷，保留旧商品版mysql-data卷；不要为了重建结构直接删除旧卷。
 
 数据库初始化仅空卷执行。后续修改SQL需要迁移，不能认为重启会自动更新现有表。

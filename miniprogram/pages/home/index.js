@@ -193,7 +193,7 @@ Page({
     const product = this.data.items.find(item => item.id === id)
     if (!product) return
     if (product.stock <= 0) {
-      wx.showToast({ title: '这件好物正在补货', icon: 'none' })
+      wx.showToast({ title: '商品暂时无货', icon: 'none' })
       return
     }
     if (!isLoggedIn()) {

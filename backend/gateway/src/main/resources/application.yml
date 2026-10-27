@@ -37,3 +37,7 @@ management:
         include: health,info
 market:
   auth-url: ${AUTH_URL:http://localhost:8081/api/users/identity}
+springdoc:
+  swagger-ui:
+    url: /openapi.yml
+    disable-swagger-default-url: true
