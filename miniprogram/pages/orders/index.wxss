@@ -24,13 +24,10 @@
 }
 
 .wallet-card {
-  position: relative;
-  overflow: hidden;
-  padding: 30rpx;
-  border-radius: 28rpx;
-  background: linear-gradient(140deg, #24523e 0%, #173a2b 100%);
-  color: #fffdf3;
-  box-shadow: 0 22rpx 44rpx rgba(23, 58, 43, 0.2);
+  padding: 24rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 14rpx;
+  background: #fff;
 }
 
 .wallet-card__top {
@@ -41,14 +38,13 @@
 
 .wallet-card__label {
   font-size: 22rpx;
-  color: rgba(255, 253, 243, 0.62);
-  letter-spacing: 1rpx;
+  color: var(--muted);
 }
 
 .wallet-card__amount {
   margin-top: 4rpx;
-  font-size: 52rpx;
-  font-weight: 800;
+  font-size: 42rpx;
+  font-weight: 700;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
 }
@@ -70,7 +66,7 @@
 .wallet-card__hint {
   margin-top: 18rpx;
   font-size: 21rpx;
-  color: rgba(255, 253, 243, 0.62);
+  color: var(--muted);
 }
 
 .orders-filters {
@@ -107,10 +103,10 @@
 
 .order {
   padding: 26rpx;
-  border-radius: 28rpx;
+  border-radius: 14rpx;
   background: var(--surface);
   border: 1rpx solid var(--line);
-  box-shadow: 0 12rpx 28rpx rgba(31, 56, 44, 0.05);
+  box-shadow: none;
 }
 
 .order__head {

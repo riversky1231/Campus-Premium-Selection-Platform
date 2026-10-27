@@ -8,18 +8,8 @@ const { isLoggedIn, requireLogin } = require('../../utils/session')
 
 const PAGE_SIZE = 12
 
-function greetingText() {
-  const hour = new Date().getHours()
-  if (hour < 6) return '夜深了'
-  if (hour < 11) return '早上好'
-  if (hour < 14) return '中午好'
-  if (hour < 18) return '下午好'
-  return '晚上好'
-}
-
 Page({
   data: {
-    greeting: '你好',
     categories: [],
     items: [],
     skeletons: [1, 2, 3, 4],
@@ -36,7 +26,6 @@ Page({
   },
 
   onLoad() {
-    this.setData({ greeting: greetingText() })
     this.searchDebounced = debounce(() => {
       this.load(true)
     }, 380)

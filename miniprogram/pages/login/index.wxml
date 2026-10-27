@@ -1,15 +1,13 @@
 <view class="page login">
   <view class="login-hero">
     <view class="login-brand">
-      <view class="login-brand__mark">优</view>
+      <view class="login-brand__mark">店</view>
       <view>
-        <view class="login-brand__name">校园优选</view>
-        <view class="login-brand__meta">CAMPUS DAILY GOODS</view>
+        <view class="login-brand__name">校园小店</view>
       </view>
     </view>
-    <view class="login-title">登录后，</view>
-    <view class="login-title login-title--accent">把好物带走。</view>
-    <view class="login-desc">校园自提 · 余额支付 · 订单随时可查</view>
+    <view class="login-title">登录校园小店</view>
+    <view class="login-desc">登录后可加入购物车、提交订单和查看取货码。</view>
   </view>
 
   <view class="login-card">
@@ -84,5 +82,5 @@
     <view class="login-hint">首次使用请先注册学生账号；管理员请使用部署时配置的账号密码。</view>
   </view>
 
-  <view class="login-back" bindtap="goHome">先随便逛逛 →</view>
+  <view class="login-back" bindtap="goHome">暂不登录，返回首页</view>
 </view>

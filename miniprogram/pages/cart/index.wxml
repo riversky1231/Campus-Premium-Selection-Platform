@@ -1,9 +1,8 @@
 <view class="page {{items.length && !error ? 'page--bar' : ''}}">
   <view class="cart-head">
     <view>
-      <view class="eyebrow">YOUR CART</view>
       <view class="page-title">购物车</view>
-      <view class="page-subtitle">{{items.length ? '共 ' + count + ' 件 · 合计 ¥' + total : '把喜欢的好物先放进来'}}</view>
+      <view class="page-subtitle">{{items.length ? '共 ' + count + ' 件商品' : '购物车是空的'}}</view>
     </view>
     <view class="cart-head__link" bindtap="openOrders">我的订单 →</view>
   </view>
@@ -20,7 +19,6 @@
   </view>
 
   <view wx:elif="{{error && !items.length}}" class="empty">
-    <view class="empty__icon">🌧️</view>
     <view class="empty__title">购物车加载失败</view>
     <view class="empty__text">检查网络后重试</view>
     <view class="empty__action">
@@ -29,7 +27,6 @@
   </view>
 
   <view wx:elif="{{!loading && !items.length}}" class="empty">
-    <view class="empty__icon">🧺</view>
     <view class="empty__title">购物车还是空的</view>
     <view class="empty__text">去挑几件课间补给吧</view>
     <view class="empty__action">
@@ -82,7 +79,6 @@
     </view>
 
     <view class="wallet {{balanceEnough ? '' : 'wallet--warn'}}">
-      <text class="wallet__icon">💳</text>
       <view class="grow">
         <view class="wallet__title">账户余额 {{walletLoaded ? '¥' + balance : '暂不可用'}}</view>
         <view class="wallet__hint">{{walletHint}}</view>
@@ -175,7 +171,7 @@
       </view>
     </view>
 
-    <view class="note cart-note">提交订单后请在 15 分钟内完成余额支付，超时订单会自动关闭并释放库存。</view>
+    <view class="note cart-note">订单提交后需在 15 分钟内完成余额支付，超时将自动取消。</view>
   </block>
 </view>
 

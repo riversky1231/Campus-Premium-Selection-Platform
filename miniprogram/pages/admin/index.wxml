@@ -1,6 +1,5 @@
 <view wx:if="{{stage == 'login'}}" class="page admin-login">
   <view class="admin-login__head">
-    <view class="eyebrow">STAFF WORKSPACE</view>
     <view class="page-title">管理台</view>
     <view class="page-subtitle">用管理员账号登录，管理商品、分类、核销与用户。</view>
   </view>
@@ -49,9 +48,8 @@
 <view wx:else class="page admin">
   <view class="admin-head">
     <view>
-      <view class="eyebrow">STAFF WORKSPACE</view>
       <view class="page-title">管理台</view>
-      <view class="page-subtitle">{{adminName}} · 商品与订单实时数据</view>
+      <view class="page-subtitle">{{adminName}} · 商品、分类和订单</view>
     </view>
     <view class="admin-head__logout" bindtap="logout">退出</view>
   </view>
@@ -64,7 +62,6 @@
       data-tab="{{item.key}}"
       bindtap="switchTab"
     >
-      <text class="admin-tab__icon">{{item.icon}}</text>
       <text>{{item.label}}</text>
     </view>
   </view>
@@ -105,7 +102,6 @@
     </view>
 
     <view wx:elif="{{productError && !products.length}}" class="empty">
-      <view class="empty__icon">🌧️</view>
       <view class="empty__title">商品加载失败</view>
       <view class="empty__text">检查后端或管理员登录状态</view>
       <view class="empty__action">
@@ -114,9 +110,8 @@
     </view>
 
     <view wx:elif="{{!productLoading && !products.length}}" class="empty">
-      <view class="empty__icon">🧺</view>
       <view class="empty__title">{{productKeyword ? '没有找到商品' : '还没有商品'}}</view>
-      <view class="empty__text">{{productKeyword ? '换个关键词试试' : '创建第一件好物吧'}}</view>
+      <view class="empty__text">{{productKeyword ? '试试其他关键词' : '添加商品后会显示在这里'}}</view>
       <view class="empty__action">
         <view class="btn btn--sm" bindtap="openCreate">新建商品</view>
       </view>
@@ -124,7 +119,10 @@
 
     <view wx:else class="admin-products">
       <view wx:for="{{products}}" wx:key="id" class="admin-product fade-in">
-        <view class="admin-product__art">{{item.emoji}}</view>
+        <view class="admin-product__art">
+          <image wx:if="{{item.imageUrl}}" class="admin-product__image" src="{{item.imageUrl}}" mode="aspectFill" />
+          <text wx:else>{{item.emoji}}</text>
+        </view>
         <view class="admin-product__body">
           <view class="admin-product__top">
             <view class="admin-product__name">{{item.name}}</view>
@@ -180,7 +178,6 @@
     </view>
 
     <view wx:if="{{!categories.length}}" class="empty">
-      <view class="empty__icon">🏷️</view>
       <view class="empty__title">还没有分类</view>
       <view class="empty__text">先创建一个分类，再上架商品</view>
     </view>
@@ -247,14 +244,12 @@
       <view class="empty__text">正在加载待提货订单…</view>
     </view>
     <view wx:elif="{{paidError}}" class="empty">
-      <view class="empty__icon">🌧️</view>
       <view class="empty__title">待提货订单加载失败</view>
       <view class="empty__action">
         <view class="btn btn--ghost btn--sm" bindtap="loadPaidOrders">重新加载</view>
       </view>
     </view>
     <view wx:elif="{{!paidOrders.length}}" class="empty">
-      <view class="empty__icon">✅</view>
       <view class="empty__title">暂无待提货订单</view>
       <view class="empty__text">用户支付后会出现在这里</view>
     </view>
@@ -287,7 +282,6 @@
     </view>
 
     <view wx:elif="{{usersError && !users.length}}" class="empty">
-      <view class="empty__icon">🌧️</view>
       <view class="empty__title">用户加载失败</view>
       <view class="empty__text">检查后端或管理员登录状态</view>
       <view class="empty__action">
@@ -296,7 +290,6 @@
     </view>
 
     <view wx:elif="{{!users.length}}" class="empty">
-      <view class="empty__icon">👥</view>
       <view class="empty__title">暂无用户</view>
     </view>
 

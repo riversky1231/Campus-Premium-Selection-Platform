@@ -47,7 +47,7 @@ Page({
         product: Object.assign({}, product, {
           priceText: money(product.price),
           emoji: category ? categoryEmoji(category.name) : categoryEmoji(''),
-          categoryName: category ? category.name : '校园好物'
+          categoryName: category ? category.name : '商品'
         }),
         quantity: 1,
         maxQuantity: maxQuantity,
@@ -74,7 +74,7 @@ Page({
     const product = this.data.product
     if (!product) return
     if (product.stock <= 0) {
-      wx.showToast({ title: '这件好物正在补货', icon: 'none' })
+      wx.showToast({ title: '商品暂时无货', icon: 'none' })
       return
     }
     if (!isLoggedIn()) {

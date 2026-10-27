@@ -7,7 +7,6 @@
 
 <view wx:elif="{{error}}" class="page">
   <view class="empty">
-    <view class="empty__icon">🫙</view>
     <view class="empty__title">这件好物不见了</view>
     <view class="empty__text">可能已经下架，或链接不正确</view>
     <view class="empty__action">
@@ -26,7 +25,6 @@
   </view>
 
   <view class="detail-head">
-    <view class="eyebrow">CAMPUS SELECTION</view>
     <view class="page-title detail-title">{{product.name}}</view>
     <view class="detail-price-row">
       <view class="price price--xl"><text class="detail-yen">¥</text>{{product.priceText}}</view>
@@ -36,15 +34,9 @@
     </view>
   </view>
 
-  <view class="detail-tags">
-    <view class="detail-tag">🏫 校园自提</view>
-    <view class="detail-tag">📦 库存实时校验</view>
-    <view class="detail-tag">🧾 下单可取消</view>
-  </view>
-
   <view class="card detail-desc">
-    <view class="section-title">好物说明</view>
-    <view class="detail-desc__text">{{product.description || '这件好物还没有额外说明，欢迎到自提点挑选。'}}</view>
+    <view class="section-title">商品说明</view>
+    <view class="detail-desc__text">{{product.description || '暂无商品说明'}}</view>
   </view>
 
   <view class="card detail-qty">
@@ -69,36 +61,12 @@
     </view>
   </view>
 
-  <view class="detail-notes">
-    <view class="detail-note">
-      <text class="detail-note__icon">🏫</text>
-      <view class="grow">
-        <view class="detail-note__title">到点自提</view>
-        <view class="muted">支付成功后凭提货码到自提点取货</view>
-      </view>
-    </view>
-    <view class="detail-note">
-      <text class="detail-note__icon">⏱️</text>
-      <view class="grow">
-        <view class="detail-note__title">15 分钟内支付</view>
-        <view class="muted">超时未支付会自动关闭并释放库存</view>
-      </view>
-    </view>
-    <view class="detail-note">
-      <text class="detail-note__icon">💳</text>
-      <view class="grow">
-        <view class="detail-note__title">余额支付</view>
-        <view class="muted">演示环境使用校园账户余额，不接入真实微信支付</view>
-      </view>
-    </view>
-  </view>
-
-  <view class="detail-footnote">价格与库存以提交订单时服务端校验为准。</view>
+  <view class="detail-pickup">下单后使用账户余额支付，支付成功后凭提货码到自提点取货。待支付订单保留 15 分钟。</view>
 
   <view class="bottom-bar detail-bar">
     <view class="detail-bar__price">
       <view class="price"><text class="detail-yen">¥</text>{{product.priceText}}</view>
-      <view class="detail-bar__hint">校园自提</view>
+      <view class="detail-bar__hint">校内自提</view>
     </view>
     <view class="detail-bar__cart" bindtap="openCart" hover-class="detail-bar__cart--hover">
       <text class="detail-bar__cart-icon">🛒</text>

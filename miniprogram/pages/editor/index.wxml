@@ -1,8 +1,7 @@
 <view class="page {{categories.length && !loading ? 'page--bar' : ''}}">
   <view class="editor-head">
-    <view class="eyebrow">CATALOG / EDITOR</view>
-    <view class="page-title">{{isEdit ? '编辑好物' : '上新一件好物'}}</view>
-    <view class="page-subtitle">{{isEdit ? '修改会立即同步到商品展示' : '填写商品信息，保存后马上出现在店铺'}}</view>
+    <view class="page-title">{{isEdit ? '编辑商品' : '新增商品'}}</view>
+    <view class="page-subtitle">填写名称、分类、价格和库存。</view>
   </view>
 
   <view wx:if="{{loading}}" class="editor-skeleton">
@@ -13,7 +12,6 @@
   </view>
 
   <view wx:elif="{{categoriesError}}" class="empty">
-    <view class="empty__icon">🌧️</view>
     <view class="empty__title">分类加载失败</view>
     <view class="empty__text">检查后端是否启动，或稍后再试</view>
     <view class="empty__action">
@@ -22,7 +20,6 @@
   </view>
 
   <view wx:elif="{{!categories.length}}" class="empty">
-    <view class="empty__icon">🏷️</view>
     <view class="empty__title">还没有商品分类</view>
     <view class="empty__text">先到管理台创建一个分类，再上架商品</view>
     <view class="empty__action">
@@ -130,7 +127,7 @@
       <switch checked="{{onSale}}" bindchange="sale" color="#204c39" />
     </view>
 
-    <view class="note editor-tip">保存后可在管理台继续编辑、补库存或上下架。</view>
+  <view class="note editor-tip">保存后可在管理台修改商品信息和库存。</view>
   </block>
 </view>
 

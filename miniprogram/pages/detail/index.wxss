@@ -29,21 +29,13 @@
   justify-content: center;
   height: 420rpx;
   overflow: hidden;
-  border-radius: 34rpx;
-  background: linear-gradient(150deg, #eef1da 0%, #dfe6ca 55%, #e9edd6 100%);
+  border-radius: 12rpx;
+  background: #eeede8;
   border: 1rpx solid var(--line);
 }
 
 .detail-art__orb {
-  position: absolute;
-  width: 360rpx;
-  height: 360rpx;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center,
-    rgba(255, 253, 247, 0.9) 0%,
-    rgba(255, 253, 247, 0) 68%
-  );
+  display: none;
 }
 
 .detail-art__emoji {
@@ -63,8 +55,8 @@
   top: 24rpx;
   left: 24rpx;
   padding: 8rpx 20rpx;
-  border-radius: 999rpx;
-  background: rgba(255, 253, 247, 0.78);
+  border-radius: 6rpx;
+  background: rgba(255, 255, 255, 0.9);
   color: var(--brand);
   font-size: 21rpx;
   font-weight: 600;
@@ -93,21 +85,6 @@
   font-weight: 600;
 }
 
-.detail-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 24rpx;
-}
-
-.detail-tag {
-  padding: 10rpx 18rpx;
-  border-radius: 14rpx;
-  background: var(--surface-soft);
-  color: var(--ink-soft);
-  font-size: 21rpx;
-}
-
 .detail-desc {
   margin-top: 28rpx;
 }
@@ -124,37 +101,14 @@
   margin-top: 20rpx;
 }
 
-.detail-notes {
+.detail-pickup {
   margin-top: 30rpx;
-  padding: 6rpx 4rpx;
-}
-
-.detail-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 18rpx;
-  padding: 18rpx 0;
-  border-bottom: 1rpx solid var(--line);
-}
-
-.detail-note:last-child {
-  border-bottom: none;
-}
-
-.detail-note__icon {
-  font-size: 34rpx;
-  line-height: 1.2;
-}
-
-.detail-note__title {
-  font-size: 26rpx;
-  font-weight: 600;
-}
-
-.detail-footnote {
-  margin: 24rpx 4rpx 0;
-  font-size: 21rpx;
-  color: var(--muted);
+  padding: 20rpx 22rpx;
+  border-left: 4rpx solid var(--brand);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: 23rpx;
+  line-height: 1.65;
 }
 
 .detail-bar {
@@ -178,7 +132,7 @@
   justify-content: center;
   width: 86rpx;
   height: 86rpx;
-  border-radius: 20rpx;
+  border-radius: 10rpx;
   background: var(--surface-soft);
 }
 

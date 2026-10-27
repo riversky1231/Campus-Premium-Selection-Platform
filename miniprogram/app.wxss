@@ -1,24 +1,24 @@
 page {
-  --bg: #f6f3e9;
-  --surface: #fffdf7;
-  --surface-soft: #f0ecdd;
-  --surface-deep: #e8e4d3;
-  --ink: #1f382c;
-  --ink-soft: #4e6456;
-  --muted: #84907f;
-  --brand: #204c39;
-  --brand-deep: #153528;
-  --accent: #d9e87f;
-  --accent-soft: #eff5c9;
-  --danger: #b34a2d;
-  --danger-soft: #f9e5dc;
-  --warn: #9a6516;
-  --warn-soft: #f8ecd0;
-  --ok: #2a6a4c;
-  --ok-soft: #dcefe2;
-  --line: rgba(31, 56, 44, 0.1);
-  --line-strong: rgba(31, 56, 44, 0.18);
-  --shadow: 0 18rpx 44rpx rgba(31, 56, 44, 0.08);
+  --bg: #f5f5f2;
+  --surface: #ffffff;
+  --surface-soft: #efefeb;
+  --surface-deep: #e6e7e1;
+  --ink: #272a26;
+  --ink-soft: #555b54;
+  --muted: #858b83;
+  --brand: #315846;
+  --brand-deep: #274837;
+  --accent: #dce8dc;
+  --accent-soft: #edf3ed;
+  --danger: #b54a36;
+  --danger-soft: #f7e9e5;
+  --warn: #9a6a27;
+  --warn-soft: #f5efdf;
+  --ok: #315846;
+  --ok-soft: #e8f0e9;
+  --line: rgba(39, 42, 38, 0.09);
+  --line-strong: rgba(39, 42, 38, 0.18);
+  --shadow: 0 6rpx 20rpx rgba(39, 42, 38, 0.04);
   background-color: var(--bg);
   color: var(--ink);
   font-family: "PingFang SC", "Helvetica Neue", "Noto Sans SC", sans-serif;
@@ -72,8 +72,8 @@ button::after {
 
 .page-title {
   margin-top: 10rpx;
-  font-size: 54rpx;
-  font-weight: 800;
+  font-size: 48rpx;
+  font-weight: 700;
   line-height: 1.16;
   letter-spacing: -1rpx;
   color: var(--ink);
@@ -160,7 +160,7 @@ button::after {
 .card {
   background: var(--surface);
   border: 1rpx solid var(--line);
-  border-radius: 28rpx;
+  border-radius: 16rpx;
   padding: 26rpx;
   box-shadow: var(--shadow);
 }
@@ -185,12 +185,12 @@ button::after {
   justify-content: center;
   height: 92rpx;
   padding: 0 34rpx;
-  border-radius: 20rpx;
+  border-radius: 12rpx;
   background: var(--brand);
   color: #fffdf3;
   font-size: 30rpx;
   font-weight: 600;
-  letter-spacing: 1rpx;
+  letter-spacing: 0;
 }
 
 .btn--block {
@@ -355,7 +355,7 @@ button::after {
 .chip--active {
   background: var(--brand);
   color: #fffdf3;
-  box-shadow: 0 8rpx 18rpx rgba(32, 76, 57, 0.18);
+  box-shadow: none;
 }
 
 /* ---------- 数量步进器 ---------- */

@@ -1,9 +1,8 @@
 <view class="page">
   <view class="orders-head">
     <view>
-      <view class="eyebrow">MY ORDERS</view>
       <view class="page-title">我的订单</view>
-      <view class="page-subtitle">{{nickname}}，这里是你下单的好物</view>
+      <view class="page-subtitle">查看支付状态和取货信息</view>
     </view>
     <view class="orders-head__actions">
       <text class="orders-head__action" bindtap="openCart">购物车</text>
@@ -19,9 +18,8 @@
           <text wx:if="{{balanceLoaded}}" class="wallet-card__yen">¥</text>{{balanceLoaded ? balance : '暂不可用'}}
         </view>
       </view>
-      <view class="wallet-card__user">{{nickname}}</view>
     </view>
-    <view class="wallet-card__hint">余额支付为演示功能，余额不足时请联系管理员充值。</view>
+    <view class="wallet-card__hint">余额不足时请联系管理员充值。</view>
   </view>
 
   <scroll-view class="chips orders-filters" scroll-x="true" show-scrollbar="{{false}}">
@@ -45,7 +43,6 @@
   </view>
 
   <view wx:elif="{{error && !orders.length}}" class="empty">
-    <view class="empty__icon">🌧️</view>
     <view class="empty__title">订单加载失败</view>
     <view class="empty__text">检查网络后重试</view>
     <view class="empty__action">
@@ -54,9 +51,8 @@
   </view>
 
   <view wx:elif="{{!loading && !orders.length}}" class="empty">
-    <view class="empty__icon">{{status ? '🔎' : '🧾'}}</view>
     <view class="empty__title">{{status ? '当前筛选下没有订单' : '还没有订单'}}</view>
-    <view class="empty__text">{{status ? '换个状态看看' : '去挑几件好物，下单后会出现在这里'}}</view>
+    <view class="empty__text">{{status ? '试试其他订单状态' : '下单后，订单会显示在这里'}}</view>
     <view class="empty__action">
       <view class="btn btn--sm" bindtap="goHome">去逛逛</view>
     </view>
@@ -136,5 +132,4 @@
     <view wx:else class="pager__text">已显示全部订单</view>
   </view>
 
-  <view class="footer">CAMPUS PREMIUM SELECTION · 我的订单</view>
 </view>
